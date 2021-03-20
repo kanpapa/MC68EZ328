@@ -1,0 +1,212 @@
+/*
+*********************************************************************
+*         BBUG --- a bootstrap mode debugger for MC68VZ328          *
+*                             Ver 0.1                               *
+*                                                                   *
+* Copyright (C) 1999, Vladimir Gurevich                             *
+* Copyright (C) 2001, Daniel Haensse (modified for VZ328)           *
+*                                                                   *
+* BBUG is free software, covered by the GNU General Public License, *
+* and you are welcome to change it and/or distribute copies of it   *
+* under certain conditions.                                         *
+*                                                                   *
+* There is absolutely no warranty for BBUG.                         *
+*********************************************************************
+*/
+
+/* Startup messages */
+messagebox "BBUG --- a bootstrap mode debugger for MC68VZ328 Ver 0.1\n\nCopyright (C) 1999, Vladimir Gurevich\nCopyright (C) 2001, Daniel Haensse (modified for VZ328)\n\nBBUG is free software, covered by the GNU General Public License,\nand you are welcome to change it and/or distribute copies of it\nunder certain conditions.\n\nThere is absolutely no warranty for BBUG." "BBUG Ver 0.1" 1
+
+strdim cmdarray 6
+ 
+cmdarray[0] = 'init'
+cmdarray[1] = 'load'
+cmdarray[2] = 'start'
+cmdarray[3] = 'mdisp'
+cmdarray[4] = 'mmod'
+cmdarray[5] = 'exit'
+ 
+do while 1
+
+  listbox 'コマンドを選んでください' 'コマンド選択' cmdarray
+
+  if     result=0 then
+    call init
+  elseif result=1 then
+    call load
+  elseif result=2 then
+    call start
+  elseif result=3 then
+    call mdisp
+  elseif result=4 then
+    messagebox cmdarray[result] "cmd"
+  else
+    messagebox "Bye!" "Exit"
+    end
+  endif
+
+loop
+
+;---------------------------------------------------
+; SUBROUTINES
+;---------------------------------------------------
+
+;-------------------------------------------------
+; This macro is used to set Dragonix VZ board's serial port to 115200 bps
+;
+; Usage:
+;         init
+;-------------------------------------------------
+
+:init
+
+setbaud 19200
+setecho 1
+messagebox "Please, reset the board and press <Enter>" "init"
+send 13
+
+;input 1 @ ,-
+
+messagebox "Connected to the board" "init"
+send $FF $FF $F9 $02 $01 $00
+
+;input 1 FFFFF90201 ,-
+
+messagebox "38400 baud set." "init"
+setbaud 38400
+send $FF $FF $F9 $03 $01 $38
+
+;input 1 FFFFF90301 ,-
+
+messagebox "115200 baud set." "init"
+setbaud 115200
+
+return
+
+;-------------------------------------------------
+; This macro is used to load a b-record file
+;
+; Usage:
+;        load <b-record-file>
+;-------------------------------------------------
+
+:load
+filenamebox 'b-ecord file' 0
+if result<>0 then
+  messagebox inputstr 'title' 0
+  sendfile inputstr 1
+endif
+
+messagebox '**** Ready ****' 'load'
+
+return
+
+;-------------------------------------------------
+; This macro is used to start a program from a specific address
+;
+; Usage:
+;        start <hex-address>
+;-------------------------------------------------
+
+:start
+inputbox 'Start hex-address' 'start'
+messagebox inputstr 'start'
+return
+
+
+assign \%a \Frawcommand({perl -e 'printf "%08X", 0x\%1'}) ,-
+output \%a00 ,-
+connect
+
+;-------------------------------------------------
+; This macro is used to examine the memory on the board
+;
+; Usage:
+;        mdisp <hex-address> <number-of-bytes>
+;
+; The algorithm is:
+;	movel #<addr>, %a6
+;	movel #UTX, %a5
+;	moveb *%a6, *%a5
+;
+;-------------------------------------------------
+:mdisp
+inputbox 'hex-address' 'start'
+address=inputstr
+inputbox 'number-of-bytes' 'start'
+bytes=inputstr
+sprintf 'address %s  bytes %s' address bytes
+messagebox inputstr 'mdisp'
+return
+
+
+
+
+assign \%l \%2 ,-
+decr \%l ,-
+for \%c 0 \%l 1 { ,-
+	assign \%a \Frawcommand({perl -e 'printf "%08X", 0x\%1 + \%c'}) ,-
+	assign \%m \Feval(\%c % 16) ,-
+	if = \%m 0 xecho {\13\10\%a} ,-
+	output FFFFFC00082C7C\%a4E71\13 ,-
+	input 5 \13 ,-
+	output FFFFFC0000 ,-
+	output FFFFFC00082A7CFFFFF9074E71\13 ,-
+	input 5 \13 ,-
+	output FFFFFC0000 ,-
+	output FFFFFC00081A964E714E714E71\13 ,-
+	input 5 \13 ,-
+	output FFFFFC0000 ,-
+	input 5 FFFFFC0000 ,-
+	input 5 ,-
+	assign \%i \Fcode(\v(inchar)) ,-
+	if NUMERIC \%i xecho { \13\10 \Fhexify(\v(inchar))\13\10} ,-
+	else xecho { \13\10 00\13\10} ,-
+} ,-
+echo ,-
+echo
+return
+
+;-------------------------------------------------
+; This macro is used to modify memory contents on the board
+;
+; Usage:
+;        mmod <hex-address>
+;
+; The command will display the contents of the specified address.
+; Enter
+;        <hex-digit><hex-digit><Return> -- to enter new value
+;        <Return>                       -- to go to the next location
+;        .<Return>                      -- to quit
+;-------------------------------------------------
+:mmod
+assign \%r n ,-
+assign \%a  \Frawcommand({perl -e 'printf "%08X", 0x\%1'}) ,-
+while ! EQUAL \%r \46 { ,-
+	assign \%q \%a ,-
+        output FFFFFC00082C7C\%a4E71\13 ,-
+        input 5 \13 ,-
+        output FFFFFC0000 ,-
+        output FFFFFC00082A7CFFFFF9074E71\13 ,-
+        input 5 \13 ,-
+        output FFFFFC0000 ,-
+        output FFFFFC00081A964E714E714E71\13 ,-
+        input 5 \13 ,-
+        output FFFFFC0000 ,-
+        input 5 FFFFFC0000 ,-
+        input 5 ,-
+        assign \%i \Fcode(\v(inchar)) ,-
+        if NUMERIC \%i assign \%q {\%q \Fhexify(\v(inchar))  } ,-
+        else assign \%q {\%q 00  } ,-
+	ask \%r \%q ,-
+	assign \%l \Flength(\%r) ,-
+	if = \%l 0 { ,-
+	   assign \%a \Frawcommand({perl -e 'printf "%08X", 0x\%a + 1'}) ,-
+	   assign \%r n ,-
+	} , else if = \%l 2 { ,-
+	   output \%a01\%r\13 ,-
+	   input 5 \13 ,-
+	} ,-
+} ,-
+echo
+return
