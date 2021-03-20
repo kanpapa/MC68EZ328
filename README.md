@@ -1,7 +1,7 @@
 # MC68EZ328 SBC
 
-Based on DragonOne V1.0 (C) Khaled Hassounah
-http://www.mediumware.net/DragonOne/DragonOne.htm
+Based on DragonOne V1.0 (C) Khaled Hassounah  
+http://www.mediumware.net/DragonOne/DragonOne.htm  
 
 ## Spec
 
