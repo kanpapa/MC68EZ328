@@ -20,4 +20,4 @@ MC68EZ328 CPU
 ![MC68EZ328 CPU](/Pictures/dragonball_mc68ez328_cpu.jpg)
 
 PCB image (alpha version)  
-![PCB image by KiCad](/Pictures/DragonOne_rev00_kicad.jpg) 
+![PCB image by KiCad](/Pictures/DragonOne_rev01_kicad.jpg) 
