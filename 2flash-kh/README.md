@@ -8,7 +8,7 @@ It has been modified so that it can be compiled in the following environment.
 Note: The operation after modifying the program is unconfirmed.
 
 The original source program can be found at the following URL.
-http://www.mediumware.net/DragonOne/DragonOne.htm
+* http://www.mediumware.net/DragonOne/DragonOne.htm
 
 (c) 2001 Daniel Haensse, daniel.haensse@freesurf.ch  
 parts (c) 2000 Tom Walsh, tom@openhardware.net.  
