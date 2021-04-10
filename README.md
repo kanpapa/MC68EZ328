@@ -1,4 +1,4 @@
-# MC68EZ328 SBC
+# MC68EZ328 DragonOne SBC
 
 Under construction...  
 
