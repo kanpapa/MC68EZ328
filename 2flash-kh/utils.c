@@ -132,19 +132,19 @@ int Modulo (int Dividend, int Divisor)
 {
 int	k;
 #ifdef BOOTCODE
-asm volatile ("
-	move.l	8(%%a6), %%d0
-	move.l	12(%%a6), %%d1
-	divu		%%d1, %%d0
-	move.l	%%d0, %0
-	" : "=d" (k) : : "%%d0", "%%d1");
+asm volatile (				\
+	"move.l	8(%%a6), %%d0	\n\t"	\
+	"move.l	12(%%a6), %%d1	\n\t"	\
+	"divu	%%d1, %%d0	\n\t"	\
+	"move.l	%%d0, %0	"	\
+	 : "=d" (k) : : "%%d0", "%%d1");
 #else
-asm volatile ("
-	move.l	8(%%sp), %%d0
-	move.l	12(%%sp), %%d1
-	divu		%%d1, %%d0
-	move.l	%%d0, %0
-	" : "=d" (k) : : "%%d0", "%%d1");
+asm volatile (				\
+	"move.l	8(%%sp), %%d0	\n\t"	\
+	"move.l	12(%%sp), %%d1	\n\t"	\
+	"divu	%%d1, %%d0	\n\t"	\
+	"move.l	%%d0, %0	"	\
+	 : "=d" (k) : : "%%d0", "%%d1");
 #endif
 	return (k >> 16);
 }
@@ -154,22 +154,19 @@ int Divide (int Dividend, int Divisor)
 {
 int	k;
 #ifdef BOOTCODE
-asm volatile ("
-	move.l	8(%%a6), %%d0
-	move.l	12(%%a6), %%d1
-	divu		%%d1, %%d0
-	move.l	%%d0, %0
-	" : "=d" (k) : : "%%d0", "%%d1");
+asm volatile (				\
+	"move.l	8(%%a6), %%d0	\n\t"	\
+	"move.l	12(%%a6), %%d1	\n\t"	\
+	"divu	%%d1, %%d0	\n\t"	\
+	"move.l	%%d0, %0	"	\
+	 : "=d" (k) : : "%%d0", "%%d1");
 #else
-asm volatile ("
-	move.l	8(%%sp), %%d0
-	move.l	12(%%sp), %%d1
-	divu		%%d1, %%d0
-	move.l	%%d0, %0
-	" : "=d" (k) : : "%%d0", "%%d1");
+asm volatile (				\
+	"move.l	8(%%sp), %%d0	\n\t"	\
+	"move.l	12(%%sp), %%d1	\n\t"	\
+	"divu	%%d1, %%d0	\n\t"	\
+	"move.l	%%d0, %0	"	\
+	 : "=d" (k) : : "%%d0", "%%d1");
 #endif
 	return (k & 0xffffl);
 }
-
-
-
