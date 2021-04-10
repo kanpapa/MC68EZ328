@@ -1,6 +1,7 @@
 
 .EXPORT_ALL_VARIABLES:
-INCLUDE_DIR = /opt/uClinux/linux/include
+#INCLUDE_DIR = /opt/uClinux/linux/include
+INCLUDE_DIR = ../uClinux-dist/linux-3.x/arch/m68k/include
 #
 # Define architecture and board implemenation
 #
@@ -19,12 +20,17 @@ CFLAGS := -D$(MODEL) -DBOOTCODE -pipe -m68000 -D__COFF__ -DNO_MM -DNO_FPU -DMAGI
 
 AFLAGS := $(CFLAGS) -Wa,--bitwise-or
 
-GCC_EXEC_PREFIX = m68k-coff-
+#GCC_EXEC_PREFIX = m68k-coff-
+#GCC_EXEC_PREFIX = m68k-uclinux-
 
-CC = $(GCC_EXEC_PREFIX)gcc
-AS = $(GCC_EXEC_PREFIX)as
-LD = $(GCC_EXEC_PREFIX)ld
-OBJCOPY = $(GCC_EXEC_PREFIX)objcopy
+#CC = $(GCC_EXEC_PREFIX)gcc
+#AS = $(GCC_EXEC_PREFIX)as
+#LD = $(GCC_EXEC_PREFIX)ld
+#OBJCOPY = $(GCC_EXEC_PREFIX)objcopy
+CC = m68k-uclinux-gcc
+AS = m68k-uclinux-as
+LD = m68k-uclinux-ld
+OBJCOPY = m68k-uclinux-objcopy
 SPLASHSCRIPT = tools/bootlogo.pl
 STOB = ./stob
 #LIBS = lib/libstandalone.a
