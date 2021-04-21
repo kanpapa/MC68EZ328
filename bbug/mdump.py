@@ -9,34 +9,32 @@ import sys
 import serial
 import time
 
-def ser_send(brec):
-	rxbuff = ''			# clear receive data buffer
-
+def ser_send(ser, brec):
 	s_length = len(brec)		# length of the string sent
 
 	ser.reset_input_buffer()	# clear input buffer
 	ser.reset_output_buffer()	# clear output buffer
 
 	# send b-record
-	ser.write(brec)			# Send B-Record
+	ser.write(brec.encode())			# Send B-Record
 	timeout_cnt = 100000		# timeout value
-	while(out_waiting == 0):	# waiting to be sent
+	while(ser.out_waiting > 0):	# waiting to be sent
 		timeout_cnt -=1
 		if (timeout_cnt == 0):
+			print("TX timeout")
 			return 1
 
 	# Read echoback data
-	while(s_length):
-		timeout_cnt = 100000     # timeout value
-		while(in_waiting == 0):  # no data in RX buffer
+	while(s_length > 0):
+		timeout_cnt = 10000000     # timeout value
+		while(ser.in_waiting == 0):  # no data in RX buffer
 			timeout_cnt -= 1
 			if (timeout_cnt == 0):
+				print("RX timeout")
 				return 1
 
-			rxbuff = rxbuff + ser.read(1)
-			s_length -= 1
-
-	print(rxbuff)	# debug print
+		rxbuff = ser.read(1)
+		s_length -= 1
 
 	return 0
 
@@ -63,14 +61,14 @@ for i in range(dumpcnt):
     print(" ", end='')
 
   # load code  
-  ser_send("\nFFFFFFAA082C7C")
-  ser_send(format(dumpadrs, '08X'))
-  ser_send("4E71")
-  ser_send("\nFFFFFFAA00") 
-  ser_send("\nFFFFFFAA082A7CFFFFF9074E71")
-  ser_send("\nFFFFFFAA00")
-  ser_send("\nFFFFFFAA081A964E714E714E71")
-  ser_send("\nFFFFFFAA00")
+  ser_send(ser, "\nFFFFFFAA082C7C")
+  ser_send(ser, format(dumpadrs, '08X'))
+  ser_send(ser, "4E71")
+  ser_send(ser, "\nFFFFFFAA00") 
+  ser_send(ser, "\nFFFFFFAA082A7CFFFFF9074E71")
+  ser_send(ser, "\nFFFFFFAA00")
+  ser_send(ser, "\nFFFFFFAA081A964E714E714E71")
+  ser_send(ser, "\nFFFFFFAA00")
 
   # display feedback data
   val = ser.read()
@@ -79,5 +77,7 @@ for i in range(dumpcnt):
 
   # next address
   dumpadrs = dumpadrs + 1
+
+print("\n\nend.")
 
 ser.close()
