@@ -1,7 +1,7 @@
 #
-# Memory dump program 0.1
-# for MC68EZ328
-#
+# System initalzation program 0.1
+# for MC68EZ328 DragonOne SBC
+# date: 2021/04/23
 # Kazuhiro Ouchi @kanpapa
 #
 

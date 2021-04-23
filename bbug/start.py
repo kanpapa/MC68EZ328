@@ -1,11 +1,11 @@
 #
-# Memory dump program 0.1
+# Start a program from a specific address 0.1
 # for MC68EZ328
 # date: 2021/04/23
 # Kazuhiro Ouchi @kanpapa
 #
 # Usage:
-#        mdump.py <hex-address> <number-of-bytes>
+#        start.py <hex-address>
 #
 
 import sys
@@ -41,10 +41,9 @@ def ser_send(ser, brec):
 
     return 0
 
-# Get dump address and count
-dumpadrs = int(sys.argv[1],16)
-dumpcnt  = int(sys.argv[2],16)
-print(format(dumpadrs, '08X'), format(dumpcnt, '04X'))
+# Get start address
+startadrs = int(sys.argv[1],16)
+print(format(startadrs, '08X'))
 
 # Open Serial port
 ser = serial.Serial('/dev/ttyUSB0',9600)
@@ -54,33 +53,11 @@ ser.write(13)
 line = ser.read()
 print(line)
 
-# main loop
-for i in range(dumpcnt):
-    # display memory address
-    m = i % 16
-    if m == 0:
-        print("\n", end='')
-        print(format(dumpadrs, '08X'), end='')
-        print(" ", end='')
+# main
+ser_send(ser, "\n")
+ser_send(ser, format(startadrs, '08X'))
+ser_send(ser, "00")
 
-    # load code
-    ser_send(ser, "\nFFFFFFAA082C7C")
-    ser_send(ser, format(dumpadrs, '08X'))
-    ser_send(ser, "4E71")
-    ser_send(ser, "\nFFFFFFAA00")
-    ser_send(ser, "\nFFFFFFAA082A7CFFFFF9074E71")
-    ser_send(ser, "\nFFFFFFAA00")
-    ser_send(ser, "\nFFFFFFAA081A964E714E714E71")
-    ser_send(ser, "\nFFFFFFAA00")
-
-    # display feedback data
-    val = ser.read()
-    print(format(val[0], '02X'), end='')
-    print(" ", end='')
-
-    # next address
-    dumpadrs = dumpadrs + 1
-
-print("\n\nend.")
+print("\n\nStart.")
 
 ser.close()
