@@ -1,11 +1,11 @@
 #
-# Memory dump program 0.1
+# load a b-record file 0.1
 # for MC68EZ328
 # date: 2021/04/23
 # Kazuhiro Ouchi @kanpapa
 #
 # Usage:
-#        mdump.py <hex-address> <number-of-bytes>
+#        loadb.py <b-record-file>
 #
 
 import sys
@@ -37,50 +37,33 @@ def ser_send(ser, brec):
                 return 1
 
         rxbuff = ser.read(1)
+        print(rxbuff.decode(), end='')
         s_length -= 1
 
     return 0
 
 # Get dump address and count
-dumpadrs = int(sys.argv[1],16)
-dumpcnt  = int(sys.argv[2],16)
-print(format(dumpadrs, '08X'), format(dumpcnt, '04X'))
+bfilename = sys.argv[1]
+print(bfilename)
+
+# Open bfile
+f = open(bfilename, 'r')
 
 # Open Serial port
 ser = serial.Serial('/dev/ttyUSB0',9600)
 
 # init bootloader
-ser.write(13)
-line = ser.read()
-print(line)
+#ser.write(13)
+#line = ser.read()
+#print(line)
 
-# main loop
-for i in range(dumpcnt):
-    # display memory address
-    m = i % 16
-    if m == 0:
-        print("\n", end='')
-        print(format(dumpadrs, '08X'), end='')
-        print(" ", end='')
+datalist = f.readlines()
+for data in datalist:
+    ser_send(ser, data)
+    ser_send(ser, '\n')
 
-    # load code
-    ser_send(ser, "\nFFFFFFAA082C7C")
-    ser_send(ser, format(dumpadrs, '08X'))
-    ser_send(ser, "4E71")
-    ser_send(ser, "\nFFFFFFAA00")
-    ser_send(ser, "\nFFFFFFAA082A7CFFFFF9074E71")
-    ser_send(ser, "\nFFFFFFAA00")
-    ser_send(ser, "\nFFFFFFAA081A964E714E714E71")
-    ser_send(ser, "\nFFFFFFAA00")
+f.close()
 
-    # display feedback data
-    val = ser.read()
-    print(format(val[0], '02X'), end='')
-    print(" ", end='')
-
-    # next address
-    dumpadrs = dumpadrs + 1
-
-print("\n\nend.")
+print("\n\nSend end.")
 
 ser.close()
