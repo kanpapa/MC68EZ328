@@ -47,7 +47,8 @@ dumpcnt  = int(sys.argv[2],16)
 print(format(dumpadrs, '08X'), format(dumpcnt, '04X'))
 
 # Open Serial port
-ser = serial.Serial('/dev/ttyUSB0',9600)
+#ser = serial.Serial('/dev/ttyUSB0',9600)
+ser = serial.Serial('/dev/tty.usbserial-A601E8ZH',9600)
 
 # init bootloader
 ser.write(13)
