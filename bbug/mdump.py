@@ -35,7 +35,7 @@ def ser_send(ser, brec):
             if (timeout_cnt == 0):
                 print("RX timeout")
                 return 1
-　
+
         rxbuff = ser.read(1)
         s_length -= 1
 

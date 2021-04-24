@@ -35,14 +35,15 @@ def ser_send(ser, brec):
             if (timeout_cnt == 0):
                 print("RX timeout")
                 return 1
-　
+
         rxbuff = ser.read(1)
+        print(rxbuff.decode(), end='')
         s_length -= 1
 
     return 0
 
 # Get dump address and count
-bfilename = int(sys.argv[1],16)
+bfilename = sys.argv[1]
 print(bfilename)
 
 # Open bfile
@@ -52,14 +53,14 @@ f = open(bfilename, 'r')
 ser = serial.Serial('/dev/ttyUSB0',9600)
 
 # init bootloader
-ser.write(13)
-line = ser.read()
-print(line)
+#ser.write(13)
+#line = ser.read()
+#print(line)
 
 datalist = f.readlines()
 for data in datalist:
     ser_send(ser, data)
-    ser_send('\n')
+    ser_send(ser, '\n')
 
 f.close()
 
