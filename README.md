@@ -18,11 +18,15 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 
 * /2flash-kh/
   * Flash programming software working in bootstrap mode of the 68XX328 (by Khaled Hassounah)
+* /bbug/
+  * BBUG: a bootstrap mode debugger. Implementation of BBUG using python3 and pyserial. This is an experimental program, so it is still incomplete.
+* /Hardware/
+  * Schematic PDF
 * /teraterm/
   * bbug.ttl --- BBUG: a bootstrap mode debugger. Implementation of BBUG using Teraterm macro. This is an experimental program, so it is still incomplete.
 * /KiCad/
   * PCB design data and Gerber data for KiCad. (TBA) 
-* /Pictues -- some pictures
+* /Pictues/ -- some pictures
 
 ## Pictures
 
