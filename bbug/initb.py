@@ -40,7 +40,9 @@ def ser_send(ser, brec):
     return 0
 
 # Open Serial port
-ser = serial.Serial('/dev/ttyUSB0',9600)
+#ser = serial.Serial('/dev/ttyUSB0',9600)
+ser = serial.Serial('/dev/tty.usbserial-A601E8ZH',9600)
+
 
 # init bootloader
 #ser.write(13)
