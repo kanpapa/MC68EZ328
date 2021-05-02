@@ -12,23 +12,27 @@
 ; $00080000-$0fffffff -
 ; $10000000-$107fffff Flash Memory (4Mx16bit)
 ;
-         ORG    $1000
+
+STACK_START equ $2000
+
+        ORG    $1000
 
 START:
+        lea    STACK_START, SP     ; Set our stack pointer to be sure
 
-loop:    lea.l  message.l,a3
-         bsr    wstr
-         bra    loop
+loop:   lea.l  message.l,a3
+        bsr    wstr
+        bra    loop
 
 ;
 ; a3 Pointed to first byte
 ; end with 0
-wstr:    move.b (a3)+,d7
-         cmp.b  #0,d7
-         beq    wstr1
-         bsr    putc
-         bra    wstr
-wstr1:   rts
+wstr:   move.b (a3)+,d7
+        cmp.b  #0,d7
+        beq    wstr1
+        bsr    putc
+        bra    wstr
+wstr1:  rts
 
 ;
 ; Put UART data
@@ -38,7 +42,7 @@ putc:
 pclp:
 	    move.w	$fffff906,d7
 	    and.w	#$2000,d7
-	    beq	pclp
+	    beq     pclp
 	    rts
 ;
 ; Get UART data (unused)
@@ -46,7 +50,7 @@ pclp:
 getc:
         move.w  $fffff904,d7
         and.w   #$2000,d7
-        beq getc
+        beq     getc
         move.b  $fffff905,d7
         rts
 ;
