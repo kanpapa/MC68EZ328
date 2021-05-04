@@ -14,6 +14,36 @@
 ; $10000000-$107fffff Flash Memory (4Mx16bit)
 ;
 
+**********************************
+* Defines
+*
+RAM_START           equ     $40000
+RAM_END             equ     $44000
+MAX_LINE_LENGTH     equ     80
+
+**********************************
+* ASCII Control Characters
+*
+BEL   equ $07
+BKSP  equ $08       * CTRL-H
+TAB   equ $09
+LF    equ $0A
+CR    equ $0D
+ESC   equ $1B
+
+CTRLC	EQU	$03     
+CTRLX	EQU	$18     * Line Clear
+
+
+**********************************
+* Variables
+*
+varCurAddr  equ     RAM_END-4                        * Last address accessed
+varLineBuf  equ     varCurAddr-MAX_LINE_LENGTH-2     * Line buffer
+
+varLast     equ     varLineBuf
+
+
 pSourceA        equ $00200000
 pDestinationA   equ $10000000
 pCSA            equ $fffff110
@@ -41,7 +71,7 @@ toolLine:                * Our main monitor loop
     bsr.w   lineToUpper     * Convert to upper-case for ease of parsing
     bsr.w   parseLine       * Then parse and respond to the line
     
-    bra.s   monitorLine
+    bra.s   toolLine
     
 ***************************************
 * Converts input line to uppercase
@@ -86,38 +116,38 @@ parseLine:
     rts
     
 ******************************************
-.flashInfo:
-.flashErase:
-.flashProgram:
-    lea     msgInfoCSA, A0   * Show our banner
+  .flashInfo:
+  .flashErase:
+  .flashProgram:
+    lea     msgInfoCSA, A0      * CSA is set to 0x
     bsr.w   printString
     move.l  pCSA, d0
     bsr.w   printHexLong
-    lea     msgInfoMsg1, A0
+    lea     msgInfoMsg1, A0     * Plase make sure timing is right
     bsr.w   printString
 
     * Read Reset *
-    lea     msgInfoMsg2, A0
+    lea     msgInfoMsg2, A0     * Resetting flash     
     bsr.w   printString
     move.w  #$AAAA, pDestinationA
     move.w  #$5555, pDestinationA
     move.w  #$F0F0, pDestinationA
 
-    lea     msgInfoMsg3, A0     * Autoselect code
+    lea     msgInfoMsg3, A0     * Autoselect
     bsr.w   printString
     move.w  #$AAAA, pDestinationA
     move.w  #$5555, pDestinationA
     move.w  #$9090, pDestinationA
-    lea     msgInfoMsg4, A0     * Manufacture code
+    lea     msgInfoMsg4, A0     * Manufacturer ID
     bsr.w   printString
-    move.b  pDestinationA, d0
-    bsr.w   printHexByte
+    move.W  pDestinationA, d0   * AMD = 01h
+    bsr.w   printHexWord
     bsr.w   printNewline
 
-    lea     msgInfoMsg5, A0     * Device code
+    lea     msgInfoMsg5, A0     * Device ID
     bsr.w   printString
-    move.b  pDestinationA+1, d0
-    bsr.w   printHexByte
+    move.w  pDestinationA+2, d0 * Am29LV033C = A3h
+    bsr.w   printHexWord
     bsr.w   printNewline
 
     lea     msgInfoMsg6, A0     * Sending CFI Query
@@ -128,12 +158,32 @@ parseLine:
     move.w  #$9898, pDestinationA   * CFI Query again
     lea     msgInfoMsg7, A0         * Reading CFI Query
     bsr.w   printString
-    * if
-    lea     msgInfoMsg8, A0         * Size is 0x
-    move.w  pDestinationA+$0027, d0
-    and.l   #$ff, d0
-    rol.l   1, d0                   * 1 << d0
+    
+    * Check Query OK?
+    move.w  pDestinationA+($0010<<1), d0 * Address 10h
     bsr.w   printHexWord
+    bsr.w   printNewline
+*    cmp.w   #$5151, d0              * 'QQ'
+*    bne.w   .CFIQueryError
+    move.w  pDestinationA+($0011<<1), d0 * Address 11h
+    bsr.w   printHexWord
+    bsr.w   printNewline
+*    cmp.w   #$5252, d0              * 'RR'
+*    bne.w   .CFIQueryError
+    move.w  pDestinationA+($0012<<1), d0  * Address 12h
+    bsr.w   printHexWord
+    bsr.w   printNewline
+*    cmp.w   #$5959, d0              * 'YY'
+*    bne.w   .CFIQueryError
+    
+    * Get Device Size
+    lea     msgInfoMsg8, A0         * Size is 0x
+    bsr.w   printString
+    move.w  pDestinationA+($0027<<1), d1  * Address 27h  (Device Size = 2^N byte)
+    and.w   #$FF, d1
+    move.l  #1, d0
+    asl.l   d1, d0
+    bsr.w   printHexLong
     bsr.w   printNewline
 
     * Exit software id mode
@@ -141,6 +191,11 @@ parseLine:
     * TBD
 
 
+    bra.w   .exit
+
+   .CFIQueryError:
+    lea     msgInfoMsgNoanswer, A0   * CFI Query error
+    bsr.w   printString
     bra.w   .exit
 
 ******************************************
@@ -161,6 +216,64 @@ parseLine:
 
 ******
 * Input/Output utils
+*
+******
+* Read in a line into the line buffer
+readLine:
+    movem.l d2/a2, -(SP)     * Save changed registers
+    lea     varLineBuf, a2   * Start of the lineBuffer
+    eor.w   d2, d2           * Clear the character counter
+ .loop:
+    bsr.w   inChar           * Read a character from the serial port
+    cmp.b   #BKSP, d0        * Is it a backspace?
+    beq.s   .backspace
+    cmp.b   #CTRLX, d0       * Is it Ctrl-H (Line Clear)?
+    beq.s   .lineclear
+    cmp.b   #CR, d0          * Is it a carriage return?
+    beq.s   .endline
+    cmp.b   #LF, d0          * Is it anything else but a LF?
+    beq.s   .loop            * Ignore LFs and get the next character
+ .char:                      * Normal character to be inserted into the buffer
+    cmp.w   #MAX_LINE_LENGTH, d2
+    bge.s   .loop            * If the buffer is full ignore the character
+    move.b  d0, (a2)+        * Otherwise store the character
+    addq.w  #1, d2           * Increment character count
+    bsr.w   outChar          * Echo the character
+    bra.s   .loop            * And get the next one
+ .backspace:
+    tst.w   d2               * Are we at the beginning of the line?
+    beq.s   .loop            * Then ignore it
+    bsr.w   outChar          * Backspace
+    move.b  #' ', d0
+    bsr.w   outChar          * Space
+    move.b  #BKSP, d0
+    bsr.w   outChar          * Backspace
+    subq.l  #1, a2           * Move back in the buffer
+    subq.l  #1, d2           * And current character count
+    bra.s   .loop            * And goto the next character
+ .lineclear:
+    tst     d2               * Anything to clear?
+    beq.s   .loop            * If not, fetch the next character
+    suba.l  d2, a2           * Return to the start of the buffer
+ .lineclearloop:
+    move.b  #BKSP, d0
+    bsr.w   outChar          * Backspace
+    move.b  #' ', d0
+    bsr.w   outChar          * Space
+    move.b  #BKSP, d0
+    bsr.w   outChar          * Backspace
+    subq.w  #1, d2
+    bne.s   .lineclearloop   * Go till the start of the line
+    bra.s   .loop
+ .endline:
+    bsr.w   outChar          * Echo the CR
+    move.b  #LF, d0
+    bsr.w   outChar          * Line feed to be safe
+    move.b  #0, (a2)         * Terminate the line (Buffer is longer than max to allow this at full length)
+    movea.l a2, a0           * Ready the pointer to return (if needed)
+    movem.l (SP)+, d2/a2     * Restore registers
+    rts                      * And return
+
 ******
 * Prints a newline (CR, LF)
 printNewline:
@@ -301,7 +414,7 @@ msgInfoMsg2:
 msgInfoMsg3:
     dc.b 'Autoselect Code',CR,LF,0
 msgInfoMsg4:
-    dc.b 'Manufacturer's Code=',0
+    dc.b 'Manufacturers Code=',0
 msgInfoMsg5:
     dc.b 'Device Code=',0
 msgInfoMsg6:
@@ -309,11 +422,12 @@ msgInfoMsg6:
 msgInfoMsg7:
     dc.b 'Reading CFI Query identification',CR,LF,0
 msgInfoMsg8:
-    dc.b 'Size is 0X',0
+    dc.b 'Size is 0x',0
 msgInfoMsgNoanswer:
     dc.b 'No answer',CR,LF,0
 
     END    START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
