@@ -206,6 +206,7 @@ parseLine:
     move.w  #0, statusA
     move.W  #$4444, toggleCheck
     move.W  #$2020, DQ5Check
+    move.l  #0, counter
 
     lea     msgEraseMsg1, A0        * Sending chip erase command sequence
     bsr.w   printString
@@ -216,53 +217,62 @@ parseLine:
     move.w  #$5555, pDestinationA
     move.w  #$1010, pDestinationA
 
-    move.W  #1, statusA
+    move.W  #1, statusA             * set true
 
   .flashlp1:
-    move.w  pDestinationA, d0       * statusA: D0
-    and.w   #$4444, d0              * read bits 2 and 6 (DQ6: Toggle Bit I, DQ2: Toggle Bit II)
+    cmp.W   #0, statusA             * while loop check statusA
+    beq.W   .flashlp6               * if false while end
+
+    move.w  pDestinationA, d0       * read bits 2 and 6 (DQ6: Toggle Bit I, DQ2: Toggle Bit II)
+    and.w   #$4444, d0
     move.W  d0, statusA
 
-    move.w  pDestinationA, D0
-    and.w   #$4444, d0              * check bits 2 and 6 for toggling
+    move.w  pDestinationA, D0       * check bits 2 and 6 for toggling
+    and.w   #$4444, d0
     eor.w   d0, statusA
-    cmp.w   #0, statusA
+
+    cmp.w   #0, statusA             * check for statusA
     beq.W   .flashlp4
     move.w  pDestinationA, D0
     and.w   DQ5check, D0            * check for DQ5
     cmp.W   #0, D0
     beq.W   .flashlp4
 
-    move.w  #0, toggleCheck
+    move.w  #0, toggleCheck         * toggleCheck = 0
 
-    and.W   #$20, DQ5Check
-    cmp.w   #0, DQ5Check
+    move.w  DQ5Check, D0            * should we check the lower chip?
+    and.W   #$20, D0
+    cmp.w   #0, D0
     beq.W   .flashlp2
     move.W  pDestinationA, D0
-    and.W   D0, DQ5Check
-    cmp.w   #0, DQ5Check
+    move.W  DQ5Check, D1
+    and.W   D0, D1
+    cmp.w   #0, D1
     beq.W   .flashlp2
 
-    and.W   #$ff00, DQ5Check
+    and.W   #$ff00, DQ5Check        * don't check the lower chip again
     or.W    #$44, toggleCheck
     lea     msgEraseMsg2, A0        * lower chip DQ5 is up
     bsr.w   printString
 
   .flashlp2:
-    and.W   #$2000, DQ5Check
-    cmp.w   #0, DQ5Check
+    move.w  DQ5Check, D0            * should we check the upper chip?
+    and.W   #$2000, D0
+    cmp.w   #0, D0
     beq.W   .flashlp3
     move.W  pDestinationA, D0
-    and.W   D0, DQ5Check
-    cmp.w   #0, DQ5Check
+    move.w  DQ5Check, D1
+    and.W   D0, d1
+    cmp.w   #0, D1
     beq.W   .flashlp3
 
-    and.W   #$00ff, DQ5Check
+    and.W   #$00ff, DQ5Check        * don't chech the upper chip again
     or.W    #$4400, toggleCheck
     lea     msgEraseMsg3, A0        * upper chip DQ5 is up
     bsr.w   printString
 
   .flashlp3:
+    * if we were toggling and DQ5 is set, check if we are still toggling
     move.w  pDestinationA, D0
     and.w   toggleCheck, D0
     move.w  pDestinationA, D1
@@ -271,7 +281,8 @@ parseLine:
     cmp.W   #0, d1
     beq.W   .flashlp4
 
-    move.W  $f0f0, pDestinationA
+    *  at least one chip is still toggling although its DQ5 pin is up... tough luck
+    move.W  $f0f0, pDestinationA    * reset
     lea     msgEraseMsg4, A0        * upper chip DQ5 is up
     bsr.w   printString
     bra.W   .exit
@@ -282,16 +293,15 @@ parseLine:
     cmp.l   counter, d0
     beq.W   .flashlp5
 
-    move.B  #'.', D0
+    move.B  #'.', D0                * puts "."
     bsr.w   outChar
-    move.l  #0, counter
+    move.l  #0, counter             * counter = 0
 
   .flashlp5:
-    addq.l  #1,counter
-    move.W  statusA, d0
-    cmp.w   #0, d0
-    beq.W   .flashlp1
+    addq.l  #1, counter             * counter++
+    bra.W   .flashlp1
 
+  .flashlp6:
     lea     msgEraseMsgSuccess, A0  * Erase Successful
     bsr.w   printString
     bra.w   .exit
