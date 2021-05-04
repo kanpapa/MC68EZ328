@@ -223,12 +223,12 @@ parseLine:
     cmp.W   #0, statusA             * while loop check statusA
     beq.W   .flashlp6               * if false while end
 
-    move.w  pDestinationA, d0       * read bits 2 and 6 (DQ6: Toggle Bit I, DQ2: Toggle Bit II)
-    and.w   #$4444, d0
+    move.w  pDestinationA, d0       * Read DQ7-DQ0
+    and.w   #$4444, d0              * read bits 2 and 6 (DQ6: Toggle Bit I, DQ2: Toggle Bit II)
     move.W  d0, statusA
 
-    move.w  pDestinationA, D0       * check bits 2 and 6 for toggling
-    and.w   #$4444, d0
+    move.w  pDestinationA, D0       * Read DQ7-DQ0
+    and.w   #$4444, d0              * check bits 2 and 6 for toggling
     eor.w   d0, statusA
 
     cmp.w   #0, statusA             * check for statusA
