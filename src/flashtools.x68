@@ -35,6 +35,8 @@ CTRLC	EQU	$03
 CTRLX	EQU	$18     * Line Clear
 
 
+
+
 **********************************
 * Variables
 *
@@ -116,8 +118,9 @@ parseLine:
     rts
     
 ******************************************
+* Flash Info
+******************************************
   .flashInfo:
-  .flashErase:
   .flashProgram:
     lea     msgInfoCSA, A0      * CSA is set to 0x
     bsr.w   printString
@@ -127,7 +130,7 @@ parseLine:
     bsr.w   printString
 
     * Read Reset *
-    lea     msgInfoMsg2, A0     * Resetting flash     
+    lea     msgInfoMsg2, A0     * Resetting flash
     bsr.w   printString
     move.w  #$AAAA, pDestinationA
     move.w  #$5555, pDestinationA
@@ -187,14 +190,109 @@ parseLine:
     bsr.w   printNewline
 
     * Exit software id mode
-
-    * TBD
-
+    move.w  #$f0f0, pDestinationA
 
     bra.w   .exit
 
    .CFIQueryError:
     lea     msgInfoMsgNoanswer, A0   * CFI Query error
+    bsr.w   printString
+    bra.w   .exit
+
+******************************************
+* Flash Erase
+******************************************
+  .flashErase:
+    move.w  #0, statusA
+    move.W  #$4444, toggleCheck
+    move.W  #$2020, DQ5Check
+
+    lea     msgEraseMsg1, A0        * Sending chip erase command sequence
+    bsr.w   printString
+    move.w  #$AAAA, pDestinationA   * Chip Erase command sequence
+    move.w  #$5555, pDestinationA
+    move.w  #$8080, pDestinationA
+    move.w  #$AAAA, pDestinationA
+    move.w  #$5555, pDestinationA
+    move.w  #$1010, pDestinationA
+
+    move.W  #1, statusA
+
+  .flashlp1:
+    move.w  pDestinationA, d0       * statusA: D0
+    and.w   #$4444, d0              * read bits 2 and 6 (DQ6: Toggle Bit I, DQ2: Toggle Bit II)
+    move.W  d0, statusA
+
+    move.w  pDestinationA, D0
+    and.w   #$4444, d0              * check bits 2 and 6 for toggling
+    eor.w   d0, statusA
+    cmp.w   #0, statusA
+    beq.W   .flashlp4
+    move.w  pDestinationA, D0
+    and.w   DQ5check, D0            * check for DQ5
+    cmp.W   #0, D0
+    beq.W   .flashlp4
+
+    move.w  #0, toggleCheck
+
+    and.W   #$20, DQ5Check
+    cmp.w   #0, DQ5Check
+    beq.W   .flashlp2
+    move.W  pDestinationA, D0
+    and.W   D0, DQ5Check
+    cmp.w   #0, DQ5Check
+    beq.W   .flashlp2
+
+    and.W   #$ff00, DQ5Check
+    or.W    #$44, toggleCheck
+    lea     msgEraseMsg2, A0        * lower chip DQ5 is up
+    bsr.w   printString
+
+  .flashlp2:
+    and.W   #$2000, DQ5Check
+    cmp.w   #0, DQ5Check
+    beq.W   .flashlp3
+    move.W  pDestinationA, D0
+    and.W   D0, DQ5Check
+    cmp.w   #0, DQ5Check
+    beq.W   .flashlp3
+
+    and.W   #$00ff, DQ5Check
+    or.W    #$4400, toggleCheck
+    lea     msgEraseMsg3, A0        * upper chip DQ5 is up
+    bsr.w   printString
+
+  .flashlp3:
+    move.w  pDestinationA, D0
+    and.w   toggleCheck, D0
+    move.w  pDestinationA, D1
+    and.w   toggleCheck, D1
+    eor.W   d0, d1
+    cmp.W   #0, d1
+    beq.W   .flashlp4
+
+    move.W  $f0f0, pDestinationA
+    lea     msgEraseMsg4, A0        * upper chip DQ5 is up
+    bsr.w   printString
+    bra.W   .exit
+
+  .flashlp4:
+    move.l  counter, d0
+    and.l   #$fffff000, d0
+    cmp.l   counter, d0
+    beq.W   .flashlp5
+
+    move.B  #'.', D0
+    bsr.w   outChar
+    move.l  #0, counter
+
+  .flashlp5:
+    addq.l  #1,counter
+    move.W  statusA, d0
+    cmp.w   #0, d0
+    beq.W   .flashlp1
+
+    lea     msgEraseMsgSuccess, A0  * Erase Successful
     bsr.w   printString
     bra.w   .exit
 
@@ -425,8 +523,32 @@ msgInfoMsg8:
     dc.b 'Size is 0x',0
 msgInfoMsgNoanswer:
     dc.b 'No answer',CR,LF,0
+msgEraseMsg1:
+    dc.b 'Sending chip erase command sequence',CR,LF,0
+msgEraseMsg2:
+    dc.b CR,LF,'lower chip DQ5 is up',CR,LF,0
+msgEraseMsg3:
+    dc.b CR,LF,'upper chip DQ5 is up',CR,LF,0
+msgEraseMsg4:
+    dc.b CR,LF,'At least one chip reported erase error, aborting',CR,LF,0
+msgEraseMsgSuccess:
+    dc.b CR,LF,'Erase Successful.',CR,LF,0
+    
+    
+    ORG   (*+3)&-4  * Force Long Word alignment
+
+statusA:
+    ds.W    1
+toggleCheck:
+    ds.W    1
+DQ5Check:
+    ds.W    1
+counter:
+    ds.l    1
+
 
     END    START        ; last line of source
+
 
 
 *~Font name~Courier New~
