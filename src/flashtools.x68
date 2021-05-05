@@ -50,6 +50,9 @@ pSourceA        equ $00200000
 pDestinationA   equ $10000000
 pCSA            equ $fffff110
 
+DELAYLOOP       EQU 10000000
+ACTUALLENGTH    EQU $400000
+
 STACK_START     equ $2000
 
         ORG    $1000
@@ -106,11 +109,13 @@ parseLine:
     beq.w   .flashErase
     cmp.b   #'P', d0            * Program command
     beq.w   .flashProgram
+    cmp.b   #'R', d0            * Reset command
+    beq.w   .flashReset
     cmp.b   #'H', d0            * Help command
     beq.w   .help
     cmp.b   #0, d0              * Ignore blank lines
-    beq.s   .exit               
- .invalid:   
+    beq.s   .exit
+ .invalid:
     lea     msgInvalidCommand, a0
     bsr.w   printString
  .exit:
@@ -120,30 +125,31 @@ parseLine:
 ******************************************
 * Flash Info
 ******************************************
-  .flashInfo:
-  .flashProgram:
+ .flashInfo:
     lea     msgInfoCSA, A0      * CSA is set to 0x
     bsr.w   printString
     move.l  pCSA, d0
     bsr.w   printHexLong
     lea     msgInfoMsg1, A0     * Plase make sure timing is right
     bsr.w   printString
+    
+     lea     pDestinationA, A1       * A1 = pDestinationA
 
     * Read Reset *
     lea     msgInfoMsg2, A0     * Resetting flash
     bsr.w   printString
-    move.w  #$AAAA, pDestinationA
-    move.w  #$5555, pDestinationA
-    move.w  #$F0F0, pDestinationA
+    move.w  #$AAAA, (A1)
+    move.w  #$5555,(A1)
+    move.w  #$F0F0,(A1)
 
     lea     msgInfoMsg3, A0     * Autoselect
     bsr.w   printString
-    move.w  #$AAAA, pDestinationA
-    move.w  #$5555, pDestinationA
-    move.w  #$9090, pDestinationA
+    move.w  #$AAAA,(A1)
+    move.w  #$5555,(A1)
+    move.w  #$9090,(A1)
     lea     msgInfoMsg4, A0     * Manufacturer ID
     bsr.w   printString
-    move.W  pDestinationA, d0   * AMD = 01h
+    move.W  (A1), d0   * AMD = 01h
     bsr.w   printHexWord
     bsr.w   printNewline
 
@@ -155,10 +161,10 @@ parseLine:
 
     lea     msgInfoMsg6, A0     * Sending CFI Query
     bsr.w   printString
-    move.w  #$AAAA, pDestinationA
-    move.w  #$5555, pDestinationA
-    move.w  #$9898, pDestinationA   * CFI Query
-    move.w  #$9898, pDestinationA   * CFI Query again
+    move.w  #$AAAA, (A1)
+    move.w  #$5555, (A1)
+    move.w  #$9898, (A1)   * CFI Query
+    move.w  #$9898, (A1)   * CFI Query again
     lea     msgInfoMsg7, A0         * Reading CFI Query
     bsr.w   printString
     
@@ -190,11 +196,11 @@ parseLine:
     bsr.w   printNewline
 
     * Exit software id mode
-    move.w  #$f0f0, pDestinationA
+    move.w  #$f0f0, (A1)
 
     bra.w   .exit
 
-   .CFIQueryError:
+  .CFIQueryError:
     lea     msgInfoMsgNoanswer, A0   * CFI Query error
     bsr.w   printString
     bra.w   .exit
@@ -203,107 +209,180 @@ parseLine:
 * Flash Erase
 ******************************************
   .flashErase:
-    move.w  #0, statusA
-    move.W  #$4444, toggleCheck
     move.W  #$2020, DQ5Check
+    move.w  #0,  UpperUp
+    move.w  #0,  LowerUp
     move.l  #0, counter
+    lea     pDestinationA, A1       * A1 = pDestinationA
 
     lea     msgEraseMsg1, A0        * Sending chip erase command sequence
     bsr.w   printString
-    move.w  #$AAAA, pDestinationA   * Chip Erase command sequence
-    move.w  #$5555, pDestinationA
-    move.w  #$8080, pDestinationA
-    move.w  #$AAAA, pDestinationA
-    move.w  #$5555, pDestinationA
-    move.w  #$1010, pDestinationA
+    move.w  #$AAAA, (A1)   * Chip Erase command sequence
+    move.w  #$5555, (A1)
+    move.w  #$8080, (A1)
+    move.w  #$AAAA, (A1)
+    move.w  #$5555, (A1)
+    move.w  #$1010, (A1)
 
-    move.W  #1, statusA             * set true
+  .flashlp01:
+    move.w  (A1), d1       * read bits 2 and 6 (DQ6: Toggle Bit I, DQ2: Toggle Bit II)
+    and.w   #$4444, d1      * 01000100 01000100
 
-  .flashlp1:
-    cmp.W   #0, statusA             * while loop check statusA
-    beq.W   .flashlp6               * if false while end
+    move.w  (A1), D0       * check bits 2 and 6 for toggling
+    and.w   #$4444, d0      * 01000100 01000100
+    cmp.w   d0, d1                  * Toggle Bit= Toggle?
+    beq.W   .flashSuccess
 
-    move.w  pDestinationA, d0       * Read DQ7-DQ0
-    and.w   #$4444, d0              * read bits 2 and 6 (DQ6: Toggle Bit I, DQ2: Toggle Bit II)
-    move.W  d0, statusA
-
-    move.w  pDestinationA, D0       * Read DQ7-DQ0
-    and.w   #$4444, d0              * check bits 2 and 6 for toggling
-    eor.w   d0, statusA
-
-    cmp.w   #0, statusA             * check for statusA
-    beq.W   .flashlp4
-    move.w  pDestinationA, D0
-    and.w   DQ5check, D0            * check for DQ5
-    cmp.W   #0, D0
-    beq.W   .flashlp4
-
-    move.w  #0, toggleCheck         * toggleCheck = 0
-
-    move.w  DQ5Check, D0            * should we check the lower chip?
-    and.W   #$20, D0
-    cmp.w   #0, D0
-    beq.W   .flashlp2
-    move.W  pDestinationA, D0
-    move.W  DQ5Check, D1
-    and.W   D0, D1
-    cmp.w   #0, D1
-    beq.W   .flashlp2
-
-    and.W   #$ff00, DQ5Check        * don't check the lower chip again
-    or.W    #$44, toggleCheck
-    lea     msgEraseMsg2, A0        * lower chip DQ5 is up
-    bsr.w   printString
-
-  .flashlp2:
-    move.w  DQ5Check, D0            * should we check the upper chip?
-    and.W   #$2000, D0
-    cmp.w   #0, D0
-    beq.W   .flashlp3
-    move.W  pDestinationA, D0
-    move.w  DQ5Check, D1
-    and.W   D0, d1
-    cmp.w   #0, D1
-    beq.W   .flashlp3
-
-    and.W   #$00ff, DQ5Check        * don't chech the upper chip again
-    or.W    #$4400, toggleCheck
-    lea     msgEraseMsg3, A0        * upper chip DQ5 is up
-    bsr.w   printString
-
-  .flashlp3:
-    * if we were toggling and DQ5 is set, check if we are still toggling
-    move.w  pDestinationA, D0
-    and.w   toggleCheck, D0
-    move.w  pDestinationA, D1
-    and.w   toggleCheck, D1
-    eor.W   d0, d1
-    cmp.W   #0, d1
-    beq.W   .flashlp4
-
-    *  at least one chip is still toggling although its DQ5 pin is up... tough luck
-    move.W  $f0f0, pDestinationA    * reset
-    lea     msgEraseMsg4, A0        * upper chip DQ5 is up
-    bsr.w   printString
-    bra.W   .exit
-
-  .flashlp4:
     move.l  counter, d0
-    and.l   #$fffff000, d0
+    and.l   #$ffff0000, d0
     cmp.l   counter, d0
-    beq.W   .flashlp5
+    beq.W   .flashSkipDots
 
     move.B  #'.', D0                * puts "."
     bsr.w   outChar
     move.l  #0, counter             * counter = 0
 
-  .flashlp5:
-    addq.l  #1, counter             * counter++
-    bra.W   .flashlp1
+  .flashSkipDots:
+    addq.l  #1, counter               * counter++
+    
+    move.w  (A1), D0
+    and.w   DQ5Check, D0             * lower chip and Upper chip DQ5 is 0
+    beq.W   .flashlp01
+    
+    move.w  (A1), D0
+    and.w   #$0020, D0                * lower chip?
+    beq.w   .flashNoLower           * lower chip DQ5 is 0 (Not lower chip)
+    and.w   #$ff00, DQ5Check
+    lea     msgEraseMsgLower, A0     * lower chip DQ5 is up
+    move.w  #1, LowerUp
+    bsr.w   printString
+  
+  .flashNoLower:
+    move.w  (A1), D0
+    and.w   #$2000, D0
+    beq.w   .flashlp01             * Upper chip DQ5 is 0 ????
+    and.w   #$00ff, DQ5Check
+    lea     msgEraseMsgUpper, A0  * upper chip DQ5 is up
+    bsr.w   printString
+    move.w  #1, UpperUp
+   
+    tst.w   UpperUp
+    beq.w   .flashlp01
+     
+    tst.w   LowerUp
+    beq.w   .flashlp01
 
-  .flashlp6:
+    move.W  (A1), D1       * Read DQ7  -DQ0 Twice (Notes 1, 2)
+    and.w   $4444, d1
+    
+    move.w  (A1), D0       * check bits 2 and 6 for toggling
+    and.w   $4444, d0
+    cmp.w   d0, d1                  * Toggle Bit= Toggle?
+    beq.W   .flashSuccess
+
+    * Erase/Program Operation NotComplete
+    move.W  $f0f0, (A1)             * Reset
+    lea     msgEraseMsgError, A0        * At least one chip reported erase error, aborting
+    bsr.w   printString
+    bra.W   .exit
+
+  .flashSuccess:
     lea     msgEraseMsgSuccess, A0  * Erase Successful
     bsr.w   printString
+    bra.w   .exit
+
+******************************************
+* flash Program
+******************************************
+  .flashProgram:
+    move.l  #0,D1                       * D1 = loop
+    move.w  #0,status
+    move.l  #0,counter
+    move.l  #$400000>>1, size
+
+    lea     pDestinationA, A1           * Dest address (Flashmemory address)
+    lea     pSourceA,A2                 * Source address (buffer address) 
+    
+    lea     msgProgMsgBanner, A0        *
+    bsr.w   printString
+
+  .flashProg1:                          * main loop
+    move.l  D1,D0                       * if((loopA%0x1000)==0
+    DIVU.w  $1000,D0
+    and.L   $ffff0000,D0
+    cmp.L   #0,D0
+    bne.W   .flashProg2
+    cmp.L   #0, counter
+    beq.w   .flashProg2
+    bsr.w   printNewline                * putS("\n\r");
+    move.l  A1,D0                       * pDestinationA + loop
+    add.L   D1,D0
+    bsr.w   printHexLong
+ 
+  .flashProg2:
+    cmp.l   #ACTUALLENGTH, D1           * // KH - modified to be able to control how much is written to the flash memory
+    bhi.L   .flashProg6
+
+    tst.L   counter                     * if(counterA==0)
+    bne.w   .flashProg2
+
+    move.w  #$AAAA, (A1)
+    move.w  #$5555, (A1)
+    move.w  #$A0A0, (A1)
+    move.w  ($0,A2,D1.l),($0,A1,D1.L)   * @(pDestinationA+loopA)=*(pSourceA+loopA);
+    move.L  #DELAYLOOP, counter
+
+  .flashProg21:
+    cmp.L   #0, counter                 * if(counterA > 0) counterA--
+    bhi.w   .flashProg3
+    sub.L   #1,counter                  * counterA--
+
+  .flashProg3:
+    cmp.l   #0, counter                 * timeout error
+    bne.w   .flashProg4
+    lea     msgProgMsgTimeout, A0       * Timeout error Bank A at
+    bsr.w   printString
+    bsr.w   printNewline                * "\n\r"
+    move.l  ($0,A1,D1.L),D0             * (pDestinationA+loopA)
+    bsr.w   printHexLong
+    bsr.w   printNewline                * "\n\r"
+    bra.w   .exit
+
+  .flashProg4:
+    move.w  ($0,A1,D1.L),D0
+    and.w   $8080,d0                    * statusA=*(pDestinationA+loopA)&0x8080;
+    move.W  d0,status
+
+    move.w  ($0,A2,D1.L),D0
+    and.w   $8080,D0
+    cmp.W   status,D0                   * if (status==(*(pSourceA+loopA)&0x8080))
+    bne.W   .flashProg5
+    add.L   #1,D1                       * loopA++;
+    cmp.L   size,D1
+    bne.W   .flashProg6
+    lea     msgProgMsgWinner, A0        * The Winner is Bank A 8-)
+    bsr.w   printString
+    bsr.w   printNewline                * putS("\n\r");
+  .flashProg5:
+    move.L	#0, counter
+
+  .flashProg6:
+    cmp.L   #ACTUALLENGTH, D1
+    bne.w   .flashProg1
+
+    lea     msgProgMsgSuccess, A0       * Success
+    bsr.w   printString
+    bra.w   .exit
+
+******************************************
+* flash Reset
+******************************************
+  .flashReset:
+    lea     msgResetMsg, A0        * Flash was reset
+    bsr.w   printString
+
+	move.w  #$F0F0, pDestinationA
+
     bra.w   .exit
 
 ******************************************
@@ -494,7 +573,7 @@ msgBanner:
     dc.b CR,LF,'Flash tools 0.1 for MC68EZ328',CR,LF,0
 msgHelp:
     dc.b 'Available Commands: ',CR,LF
-    dc.b ' (I)nfo    (E)rase    (P)rogram    (H)elp',CR,LF,0
+    dc.b ' (I)nfo    (E)rase    (P)rogram    (R)eset    (H)elp',CR,LF,0
 msgDepositPrompt:
     dc.b ': ',0
 msgPrompt:
@@ -535,29 +614,48 @@ msgInfoMsgNoanswer:
     dc.b 'No answer',CR,LF,0
 msgEraseMsg1:
     dc.b 'Sending chip erase command sequence',CR,LF,0
-msgEraseMsg2:
+msgEraseMsgLower:
     dc.b CR,LF,'lower chip DQ5 is up',CR,LF,0
-msgEraseMsg3:
+msgEraseMsgUpper:
     dc.b CR,LF,'upper chip DQ5 is up',CR,LF,0
-msgEraseMsg4:
+msgEraseMsgError:
     dc.b CR,LF,'At least one chip reported erase error, aborting',CR,LF,0
 msgEraseMsgSuccess:
     dc.b CR,LF,'Erase Successful.',CR,LF,0
-    
+msgProgMsgBanner:
+    dc.b 'Programming',CR,LF,0
+msgProgMsgTimeout:    
+    dc.b CR,'Timeout error Bank A at ',0
+msgProgMsgWinner:    
+    dc.b 'The Winner is Bank A 8-)',0
+msgProgMsgSuccess:    
+    dc.b CR,LF,'Success',CR,LF,0
+msgResetMsg:
+    dc.b CR,'Flash was reset', CR, 0
     
     ORG   (*+3)&-4  * Force Long Word alignment
 
-statusA:
+counter:
+    ds.l    1
+size:
+    ds.L    1
+status:
     ds.W    1
 toggleCheck:
     ds.W    1
 DQ5Check:
     ds.W    1
-counter:
-    ds.l    1
+UpperUp:
+    ds.w    1
+LowerUp:
+    ds.w    1
 
 
     END    START        ; last line of source
+
+
+
+
 
 
 
