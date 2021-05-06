@@ -304,27 +304,27 @@ parseLine:
     lea     msgProgMsgBanner,A0         * Programming
     bsr.w   printString
 
-  .flashProg1:                          * main loop
-    move.L  D1,D0                       * if ((loop % 0x1000) == 0 && counter == 0)
+  .flashProg1:                          *{ main loop
+    move.L  D1,D0                       *   if ((loop % 0x1000) == 0 && counter == 0)
     andi.L  #$00000FFF,D0
     bne.W   .flashProg2
     tst.L   counter
     bne.w   .flashProg2
-                                        * {
-    bsr.w   printNewline                *   putS("\n\r");
-    move.l  A1,D0                       *   pDestinationA + loop
+                                        *   {
+    bsr.w   printNewline                *       putS("\n\r");
+    move.l  A1,D0                       *       pDestinationA + loop
     add.L   D1,D0
     bsr.w   printHexLong
-                                        * }
+                                        *   }
   .flashProg2:
-    cmpi.L  #ACTUALLENGTH,D1            * if (loop < ACTUALLENGTH)  // KH - modified to be able to control how much is written to the flash memory
-    beq.W   .flashProg6                 * {   x=act, y=d1  loop - act  x > y   x <= y
+    cmpi.L  #ACTUALLENGTH,D1            *   if (loop != ACTUALLENGTH)  // KH - modified to be able to control how much is written to the flash memory
+    beq.W   .flashProg6                 *   {   x=act, y=d1  loop - act  x > y   x <= y
 
     tst.L   counter                     *       if(counter == 0)
-    bne.w   .flashProg6                 *       {
+    bne.w   .flashProg3                 *       {
 
-    move.B  #'W',d0                     * debug
-    bsr.W   outChar
+    * move.B  #'W',d0                   *           debug
+    * bsr.W   outChar
 
     move.w  #$AAAA,(A1)
     move.w  #$5555,(A1)
@@ -333,44 +333,46 @@ parseLine:
     move.L  #DELAYLOOP,counter          *           counter = DELAYLOOP;
     bra.W   .flashProg6                 *       }
 
-  .flashProg3:                          * } else {
-    tst.L  counter                      *       if(counter > 0)
-    beq.w  .flashProg4                   *       {  x=0 y=counter y-x x < y  x >= y
+  .flashProg3:                          *       } else {
+    tst.L  counter                      *            if(counter > 0)
+    beq.w  .flashProg4                   *           {  x=0 y=counter y-x x < y  x >= y
     
-    subi.L  #1,counter                  *           counter--;
-                                        *       }
+    subi.L  #1,counter                  *               counter--;
+                                        *            }
   .flashProg4:
-    tst.l   counter                     *       if (counter == 0)   timeout error
-    bne.w   .flashProg5                 *       {
+    tst.l   counter                     *            if (counter == 0)   timeout error
+    bne.w   .flashProg5                 *            {
     
-    lea     msgProgMsgTimeout, A0       *           Timeout error Bank A at
+    lea     msgProgMsgTimeout, A0       *                Timeout error Bank A at
     bsr.w   printString
-    bsr.w   printNewline                *           "\n\r"
-    move.l  ($0,A1,D1.L),D0             *           (pDestinationA + loop)
+    bsr.w   printNewline                *                "\n\r"
+    move.l  ($0,A1,D1.L),D0             *                (pDestinationA + loop)
     bsr.w   printHexLong
-    bsr.w   printNewline                *           "\n\r"
-    bra.w   .exit                       *           return(1)
-                                        *       }
+    bsr.w   printNewline                *                "\n\r"
+    bra.w   .exit                       *                return(1)
+                                        *            }
   .flashProg5:
-    move.w  ($0,A1,D1.L),D0             *       if (*(pDestinationA + loop) & 0x8080
+    move.w  ($0,A1,D1.L),D0             *            if (*(pDestinationA + loop) & 0x8080
     andi.w  #$8080,D0                   *
 
-    move.w  ($0,A2,D1.L),D2             *        == (*(pSourceA + loop) & 0x8080))
+    move.w  ($0,A2,D1.L),D2             *               == (*(pSourceA + loop) & 0x8080))
     andi.w  #$8080,D2
     cmp.W   D0,D2
-    bne.W   .flashProg6                 *       {
+    bne.W   .flashProg6                 *            {
 
-    addi.L  #2,D1                       *          loop+2; (wordp)
-    move.L	#0,counter                  *          counter=0
+    addi.L  #2,D1                       *                loop+2; (wordp)
+    move.L	#0,counter                  *                counter=0
+                                        *            }
                                         *       }
+                                        *   }
   .flashProg6:
-    cmpi.L  #ACTUALLENGTH,D1            * if (loop == ACTUALLENGTH)
-    bne.w   .flashProg1                 * {
+    cmpi.L  #ACTUALLENGTH,D1            *   if (loop == ACTUALLENGTH)
+    bne.w   .flashProg1                 *   {
 
-    lea     msgProgMsgSuccess, A0       *    Success
+    lea     msgProgMsgSuccess, A0       *       Success
     bsr.w   printString
-    bra.w   .exit                       *    return(0)
-                                        * }
+    bra.w   .exit                       *       return(0)
+                                        *   }
                                         *}  //while
 
 ******************************************
