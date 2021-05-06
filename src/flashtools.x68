@@ -51,14 +51,14 @@ pDestinationA   equ $10000000
 pCSA            equ $fffff110
 
 DELAYLOOP       EQU 10000000
-ACTUALLENGTH    EQU $400000
+ACTUALLENGTH    EQU $80000
 
 STACK_START     equ $2000
 
-        ORG    $1000
+    ORG    $1000
 
 START:
-        lea    STACK_START, SP     * Set our stack pointer to be sure
+    lea    STACK_START, SP     * Set our stack pointer to be sure
 
 **************************************************
 * Warm Restart entry point
@@ -298,81 +298,80 @@ parseLine:
     move.l  #0,D1                       * D1 = loop
     move.w  #0,status
     move.l  #0,counter
-    move.l  #$400000>>1, size
+    move.l  #$400000>>1,size
 
-    lea     pDestinationA, A1           * Dest address (Flashmemory address)
-    lea     pSourceA,A2                 * Source address (buffer address) 
+    lea     pDestinationA,A1            * A1: Dest address (Flashmemory address)
+    lea     pSourceA,A2                 * A2: Source address (buffer address) 
     
-    lea     msgProgMsgBanner, A0        *
+    lea     msgProgMsgBanner,A0         * Programming
     bsr.w   printString
 
   .flashProg1:                          * main loop
-    move.l  D1,D0                       * if((loopA%0x1000)==0
-    DIVU.w  $1000,D0
-    and.L   $ffff0000,D0
-    cmp.L   #0,D0
+    move.L  D1,D0                       * if ((loop % 0x1000) == 0 && counter == 0)
+    andi.L  #$00000FFF,D0
     bne.W   .flashProg2
-    cmp.L   #0, counter
-    beq.w   .flashProg2
-    bsr.w   printNewline                * putS("\n\r");
-    move.l  A1,D0                       * pDestinationA + loop
+    tst.L   counter
+    bne.w   .flashProg2
+                                        * {
+    bsr.w   printNewline                *   putS("\n\r");
+    move.l  A1,D0                       *   pDestinationA + loop
     add.L   D1,D0
     bsr.w   printHexLong
- 
+                                        * }
   .flashProg2:
-    cmp.l   #ACTUALLENGTH, D1           * // KH - modified to be able to control how much is written to the flash memory
-    bhi.L   .flashProg6
+    cmpi.L  #ACTUALLENGTH,D1            * if (loop < ACTUALLENGTH)  // KH - modified to be able to control how much is written to the flash memory
+    bcc.W   .flashProg3                 * {
 
-    tst.L   counter                     * if(counterA==0)
-    bne.w   .flashProg2
+    tst.L   counter                     *       if(counter == 0)
+    bne.w   .flashProg6                 *       {
 
-    move.w  #$AAAA, (A1)
-    move.w  #$5555, (A1)
-    move.w  #$A0A0, (A1)
-    move.w  ($0,A2,D1.l),($0,A1,D1.L)   * @(pDestinationA+loopA)=*(pSourceA+loopA);
-    move.L  #DELAYLOOP, counter
+    move.w  #$AAAA,(A1)
+    move.w  #$5555,(A1)
+    move.w  #$A0A0,(A1)
+    move.w  ($0,A2,D1.L),($0,A1,D1.L)   *           @(pDestinationA + loop) = *(pSourceA + loop);
+    move.L  #DELAYLOOP,counter          *           counter = DELAYLOOP;
+    bra.W   .flashProg6                 *       }
 
-  .flashProg21:
-    cmp.L   #0, counter                 * if(counterA > 0) counterA--
-    bhi.w   .flashProg3
-    sub.L   #1,counter                  * counterA--
-
-  .flashProg3:
-    cmp.l   #0, counter                 * timeout error
-    bne.w   .flashProg4
-    lea     msgProgMsgTimeout, A0       * Timeout error Bank A at
-    bsr.w   printString
-    bsr.w   printNewline                * "\n\r"
-    move.l  ($0,A1,D1.L),D0             * (pDestinationA+loopA)
-    bsr.w   printHexLong
-    bsr.w   printNewline                * "\n\r"
-    bra.w   .exit
-
+  .flashProg3:                          * } else {
+    cmpi.L  #0,counter                     *       if(counter > 0)
+    bls.w   .flashProg4                 *       {
+    
+    subi.L  #1,counter                  *           counter--
+                                        *       }
   .flashProg4:
-    move.w  ($0,A1,D1.L),D0
-    and.w   $8080,d0                    * statusA=*(pDestinationA+loopA)&0x8080;
-    move.W  d0,status
-
-    move.w  ($0,A2,D1.L),D0
-    and.w   $8080,D0
-    cmp.W   status,D0                   * if (status==(*(pSourceA+loopA)&0x8080))
-    bne.W   .flashProg5
-    add.L   #1,D1                       * loopA++;
-    cmp.L   size,D1
-    bne.W   .flashProg6
-    lea     msgProgMsgWinner, A0        * The Winner is Bank A 8-)
+    tst.l   counter                     *       if (counter == 0)   timeout error
+    bne.w   .flashProg5                 *       {
+    
+    lea     msgProgMsgTimeout, A0       *           Timeout error Bank A at
     bsr.w   printString
-    bsr.w   printNewline                * putS("\n\r");
+    bsr.w   printNewline                *           "\n\r"
+    move.l  ($0,A1,D1.L),D0             *           (pDestinationA + loop)
+    bsr.w   printHexLong
+    bsr.w   printNewline                *           "\n\r"
+    bra.w   .exit                       *           return(1)
+                                        *       }
   .flashProg5:
-    move.L	#0, counter
+    move.w  ($0,A1,D1.L),D0             *       status = *(pDestinationA + loop) & 0x8080;
+    andi.w  #$8080,D0                   *       check DQ7
+    move.W  D0,status
 
+    move.w  ($0,A2,D1.L),D0             *       if (status == (*(pSourceA + loop) & 0x8080))
+    andi.w  #$8080,D0
+    cmp.W   status,D0
+    bne.W   .flashProg6                 *       {
+
+    addi.L  #1,D1                       *          loop++;
+    move.L	#0,counter                  *          counter=0
+                                        *       }
   .flashProg6:
-    cmp.L   #ACTUALLENGTH, D1
-    bne.w   .flashProg1
+    cmpi.L  #ACTUALLENGTH,D1            * if (loop == ACTUALLENGTH)
+    bne.w   .flashProg1                 * {
 
-    lea     msgProgMsgSuccess, A0       * Success
+    lea     msgProgMsgSuccess, A0       *    Success
     bsr.w   printString
-    bra.w   .exit
+    bra.w   .exit                       *    return(0)
+                                        * }
+                                        *}  //while
 
 ******************************************
 * flash Reset
@@ -625,13 +624,13 @@ msgEraseMsgSuccess:
 msgProgMsgBanner:
     dc.b 'Programming',CR,LF,0
 msgProgMsgTimeout:    
-    dc.b CR,'Timeout error Bank A at ',0
+    dc.b CR,LF,'Timeout error Bank A at ',0
 msgProgMsgWinner:    
     dc.b 'The Winner is Bank A 8-)',0
 msgProgMsgSuccess:    
     dc.b CR,LF,'Success',CR,LF,0
 msgResetMsg:
-    dc.b CR,'Flash was reset', CR, 0
+    dc.b CR,LF,'Flash was reset',CR,LF,0
     
     ORG   (*+3)&-4  * Force Long Word alignment
 
