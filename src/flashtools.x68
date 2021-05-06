@@ -296,9 +296,7 @@ parseLine:
 ******************************************
   .flashProgram:
     move.l  #0,D1                       * D1 = loop
-    move.w  #0,status
     move.l  #0,counter
-    move.l  #$400000>>1,size
 
     lea     pDestinationA,A1            * A1: Dest address (Flashmemory address)
     lea     pSourceA,A2                 * A2: Source address (buffer address) 
@@ -320,23 +318,26 @@ parseLine:
                                         * }
   .flashProg2:
     cmpi.L  #ACTUALLENGTH,D1            * if (loop < ACTUALLENGTH)  // KH - modified to be able to control how much is written to the flash memory
-    bcc.W   .flashProg3                 * {
+    beq.W   .flashProg6                 * {   x=act, y=d1  loop - act  x > y   x <= y
 
     tst.L   counter                     *       if(counter == 0)
     bne.w   .flashProg6                 *       {
 
+    move.B  #'W',d0                     * debug
+    bsr.W   outChar
+
     move.w  #$AAAA,(A1)
     move.w  #$5555,(A1)
     move.w  #$A0A0,(A1)
-    move.w  ($0,A2,D1.L),($0,A1,D1.L)   *           @(pDestinationA + loop) = *(pSourceA + loop);
+    move.w  ($0,A2,D1.L),($0,A1,D1.L)   *           *(pDestinationA + loop) = *(pSourceA + loop);
     move.L  #DELAYLOOP,counter          *           counter = DELAYLOOP;
     bra.W   .flashProg6                 *       }
 
   .flashProg3:                          * } else {
-    cmpi.L  #0,counter                     *       if(counter > 0)
-    bls.w   .flashProg4                 *       {
+    tst.L  counter                      *       if(counter > 0)
+    beq.w  .flashProg4                   *       {  x=0 y=counter y-x x < y  x >= y
     
-    subi.L  #1,counter                  *           counter--
+    subi.L  #1,counter                  *           counter--;
                                         *       }
   .flashProg4:
     tst.l   counter                     *       if (counter == 0)   timeout error
@@ -351,16 +352,15 @@ parseLine:
     bra.w   .exit                       *           return(1)
                                         *       }
   .flashProg5:
-    move.w  ($0,A1,D1.L),D0             *       status = *(pDestinationA + loop) & 0x8080;
-    andi.w  #$8080,D0                   *       check DQ7
-    move.W  D0,status
+    move.w  ($0,A1,D1.L),D0             *       if (*(pDestinationA + loop) & 0x8080
+    andi.w  #$8080,D0                   *
 
-    move.w  ($0,A2,D1.L),D0             *       if (status == (*(pSourceA + loop) & 0x8080))
-    andi.w  #$8080,D0
-    cmp.W   status,D0
+    move.w  ($0,A2,D1.L),D2             *        == (*(pSourceA + loop) & 0x8080))
+    andi.w  #$8080,D2
+    cmp.W   D0,D2
     bne.W   .flashProg6                 *       {
 
-    addi.L  #1,D1                       *          loop++;
+    addi.L  #2,D1                       *          loop+2; (wordp)
     move.L	#0,counter                  *          counter=0
                                         *       }
   .flashProg6:
