@@ -1,6 +1,6 @@
 # b
-- init.b --- initializes the MC68EZ328
-- helloworld.b --- 
+- init.b --- Initializing the MC68EZ328
+- helloworld.b --- Test program to keep displaying "hello world".
 - echoback.b --- Test program for Echoback
-- Monitor.b --- Monitor program that runs on DRAM
-- flashtools_monitor.b --- Tool program to write monitor program to flash memory
+- Monitor.b --- 68k-Monitor running on DRAM
+- flashtools_monitor.b --- Tool program to write 68k-Monitor to flash memory
