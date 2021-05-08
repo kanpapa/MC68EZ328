@@ -40,3 +40,21 @@ MC68EZ328 CPU
 
 PCB image (alpha version)  
 ![PCB image by KiCad](/Pictures/DragonOne_rev01_kicad.jpg) 
+
+
+## License Information
+
+This code is public domain under the BSD-3-Clause License.
+
+References to any products, programs or services do not imply that they will be available in all countries in which their respective owner operates.
+
+Company, product, or services names may be trademarks or services marks of others.
+
+All libraries used in this code are copyright their respective authors.
+
+68k-Monitor Copyright (c) 2015, Hayden Kroepfl  
+
+The DragonOne Microcomputer hardware design Copyright (C) Khaled Hassounah
+
+Many thanks to the original authors for making their designs and code avaialble as open source.
+
