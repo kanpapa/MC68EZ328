@@ -2,7 +2,7 @@
 
 Under construction...  
 
-We are designing the MC68EZ328 DragonOne SBC with KiCad. 
+We are designing the MC68EZ328 DragonOne SBC with KiCad.
 
 Based on DragonOne V1.0 (C) Khaled Hassounah  
 http://www.mediumware.net/DragonOne/DragonOne.htm  
@@ -19,7 +19,7 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 * /2flash-kh/
   * Flash programming software working in bootstrap mode of the 68XX328 (by Khaled Hassounah)
 * /b/
-  * All b-record for programming and testing the MC68EZ328 DragonOne. 
+  * All b-record for programming and testing the MC68EZ328 DragonOne.
 * /bbug/
   * BBUG: a bootstrap mode debugger. Implementation of BBUG using python3 and pyserial.
 * /Hardware/
@@ -39,7 +39,7 @@ MC68EZ328 CPU
 ![MC68EZ328 CPU](/Pictures/dragonball_mc68ez328_cpu.jpg)
 
 PCB image (alpha version)  
-![PCB image by KiCad](/Pictures/DragonOne_rev01_kicad.jpg) 
+![PCB image by KiCad](/Pictures/DragonOne_rev01_kicad.jpg)
 
 
 ## License Information
@@ -52,7 +52,7 @@ Company, product, or services names may be trademarks or services marks of other
 
 All libraries used in this code are copyright their respective authors.
 
-68k-Monitor Copyright (c) 2015, Hayden Kroepfl  
+68k-Monitor Copyright (c) 2015, Hayden Kroepfl
 
 The DragonOne Microcomputer hardware design Copyright (C) Khaled Hassounah
 
