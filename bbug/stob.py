@@ -33,7 +33,7 @@ for data in datalist:
             print(format(count, '02X'), end='')
             print(data[10:10+count*2])
         elif data[1] == '3':       # S3 TYPE  S3 13 00000000 00....100 B4
-            print(data[4:8], end='')
+            print(data[4:12], end='')
             count = count - 5
             print(format(count, '02X'), end='')
             print(data[12:12+count*2])
