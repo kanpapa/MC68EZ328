@@ -25,11 +25,11 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 * /Hardware/
   * Schematic PDF
 * /KiCad/
-  * PCB design data and Gerber data for KiCad. (TBA) 
+  * PCB design data and Gerber data for [KiCad](https://www.kicad.org/). (TBA) 
 * /Pictues/
   * some pictures
 * /src
-  * All Source Code for Flash Programming and test programming. The assembler uses EASy68K.
+  * All Source Code for Flash Programming and test programming. The assembler uses [EASy68K](http://www.easy68k.com/).
 * /teraterm/
   * BBUG: a bootstrap mode debugger. Implementation of BBUG using Teraterm macro. This is an experimental program, so it is still incomplete.
 
