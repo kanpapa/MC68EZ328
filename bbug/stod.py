@@ -34,7 +34,7 @@ for data in datalist:
             count = count - 5
             start = 12
     if start != 0:
-        for i in range(0, count-1):
+        for i in range(0, count):
             if i % 8 == 0:
                 print('')
                 print('D ', end='')
