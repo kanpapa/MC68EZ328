@@ -16,8 +16,6 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 
 ## Repository Contents
 
-* /2flash-kh/
-  * Flash programming software working in bootstrap mode of the 68XX328 (by Khaled Hassounah)
 * /b/
   * All b-record for programming and testing the MC68EZ328 DragonOne.
 * /bbug/
