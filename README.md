@@ -11,7 +11,7 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 
 * CPU: MC68EZ328 DragonBall-EZ
 * Flash Memory: Am29LV033C 32 Megabit (4M x 8-Bit) x 2
-* DRAM: MT4LC4M16R6 32 Megabit (4M x 16-bit)
+* DRAM: MT4LC4M16R6 64 Megabit (4M x 16-bit)
 * RTC: DS1306
 
 ## Repository Contents
