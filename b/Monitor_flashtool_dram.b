@@ -1,9 +1,9 @@
 ********************************************************
-* init.b 
+* Monitor_flashtool_dram.b
 * for MC68EZ328 DragonOne SBC
 ********************************************************
 FFFFF1190130         emucs init, 3ws
-FFFFF0000110         SCR 
+FFFFF0000110         SCR
 FFFFFB0B0100         Disable WD
 FFFFF42B0103         enable clko
 FFFFF40B0100         enable chip select
