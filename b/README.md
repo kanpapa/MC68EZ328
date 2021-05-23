@@ -4,4 +4,4 @@
 - echoback.b --- Test program for Echoback
 - Monitor.b --- 68k-Monitor running on DRAM
 - flashtools_monitor.b --- Tool program to write 68k-Monitor to flash memory
-- Monitor_flashtool_ram.b --- It is an integrated monitor program and flash tool. It runs on RAM.
+- Monitor_flashtool_dram.b --- It is an integrated monitor program and flash tool. It runs on RAM.
