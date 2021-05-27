@@ -31,6 +31,6 @@ for data in datalist:
             fout.write(struct.pack("B", a))
             if cols > 16:
                 break;
-            
+
 fout.close()
 fin.close()
