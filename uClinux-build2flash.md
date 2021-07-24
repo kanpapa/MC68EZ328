@@ -25,8 +25,8 @@ $ sudo apt install wish
 ```
 $ mkdir git
 $ cd git
-$ git clone git@github.com:kanpapa/uClinux-dist-20020220.git
-$ git clone git@github.com:kanpapa/MC68EZ328.git
+$ git clone https://github.com/kanpapa/uClinux-dist-20020220.git
+$ git clone https://github.com/kanpapa/MC68EZ328.git
 ```
 
 ## 68000のツールチェインのインストール
@@ -61,7 +61,7 @@ uC-libc         LibC Version
 
 ```
 $ cd ~/git/MC68EZ328/bbug
-$ python3 bin2b.py ~/git/uclinux-dist-20020220/uClinux-dist/images/image.bin > ../b/image.b
+$ python3 bin2b.py ~/git/uClinux-dist-20020220/uClinux-dist/images/image.bin > ../b/image.b
 $ cd ../b
 $ cat Monitor_flashtool_dram_nostart.b image.b > upload.b
 $ echo "0000100000" >> upload.b
