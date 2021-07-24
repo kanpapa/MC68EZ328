@@ -75,9 +75,52 @@ $ echo "0000100000" >> upload.b
 1. upload.bをシリアルターミナルからアップロードします。
     * Teratermを使う場合は、遅延を入れる。(1文字ごとに0ms, 改行ごとに100ms程度）
 1. アップロードが完了すると、フラッシュ書き込み機能付きモニタが起動します。
+    ```
+    Passed.
+    
+    Chartreuse's 68000 RAM Monitor
+    for MC68EZ328 + Flashtool by kanpapa
+    ==============================
+    Available Commands: 
+     (E)xamine   (D)eposit     (G)o      (H)elp
+    Flash Commands: 
+     (I)nfo      (F)lash Erase (P)rogram (R)eset
+    >
+    ````
 1. image.bの内容が0x00200000に読み込まれていることをダンプして確認します。
+    ```
+    > E 00200000+10
+    00200000: 00 7F FF FC 10 00 04 01 10 00 23 5C 10 00 23 78 ..........#\..#x
+    ```
 1. フラッシュメモリを消去します。
+    ```
+    > F
+    Sending chip erase command sequence
+    ...................................
+         :
+    ..................................
+    lower chip DQ5 is up
+    
+    upper chip DQ5 is up
+    
+    Erase Successful.
+    >
+    ```
 1. フラッシュメモリに書き込みます。
+    ```
+    > P
+    Programming
+    
+    Source address: 00200000
+    Dest address: 10000000
+    Length: 00200000
+    10000000
+    10001000
+        :
+    10200000
+    Success
+    >
+    ```
 
 ## uClinuxの起動確認
 
