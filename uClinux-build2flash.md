@@ -25,8 +25,8 @@ $ sudo apt install wish
 ```
 $ mkdir git
 $ cd git
-$ git clone git@github.com:kanpapa/uClinux-dist-20020220.git
-$ git clone git@github.com:kanpapa/MC68EZ328.git
+$ git clone https://github.com/kanpapa/uClinux-dist-20020220.git
+$ git clone https://github.com/kanpapa/MC68EZ328.git
 ```
 
 ## 68000のツールチェインのインストール
