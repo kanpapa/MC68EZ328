@@ -26,13 +26,14 @@ $ sudo apt install wish
 $ mkdir git
 $ cd git
 $ git clone https://github.com/kanpapa/uClinux-dist-20020220.git
+$ git clone https://github.com/kanpapa/m68k-elf-tools.git
 $ git clone https://github.com/kanpapa/MC68EZ328.git
 ```
 
 ## 68000のツールチェインのインストール
 
 ```
-$ cd ~/git/MC68EZ328/m68k-elf-tools
+$ cd ~/git/m68k-elf-tools
 $ sudo ./m68k-elf-tools-20030314.sh
 ```
 
