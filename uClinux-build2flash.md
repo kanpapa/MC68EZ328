@@ -1,8 +1,8 @@
 # uClinuxのビルドからフラッシュへの書き込みまで
 
-## OSのインストール
+## ビルド環境のOSのインストール
 
-Debian 10 i386をVMWare Playerの仮想環境で動かします。
+debian 10 i386をVMWare Playerの仮想環境で動かします。
 
 1. VMware Workstation Playerをインストールします。(非営利目的であれば無償)
 1. [debian](https://www.debian.org/)の公式サイトから[debian-10.10.0-i386-xfce-CD-1.iso](https://cdimage.debian.org/debian-cd/current/i386/iso-cd/)をダウンロードします。
@@ -10,7 +10,7 @@ Debian 10 i386をVMWare Playerの仮想環境で動かします。
 
 ## 必要なパッケージをインストール
 
-Debian 10 i386が起動したら以下の手順で必要なパッケージをインストールします。
+debian 10 i386が起動したら以下の手順で必要なパッケージをインストールします。
 
 ```
 $ sudo apt install build-essential
@@ -59,6 +59,8 @@ uC-libc         LibC Version
 
 ## ブートストラップファイルの作成
 
+フラッシュ書き込み機能付きモニタのbレコードに、bレコードに変換したimage.binを追加し、最後にモニタを起動するbレコードを追加します。
+
 ```
 $ cd ~/git/MC68EZ328/bbug
 $ python3 bin2b.py ~/git/uClinux-dist-20020220/uClinux-dist/images/image.bin > ../b/image.b
@@ -70,10 +72,10 @@ $ echo "0000100000" >> upload.b
 ## フラッシュメモリへの書き込み
 
 1. MC68EZ328 SBCをブートストラップモードにします。
-    * BOOTSTRAPスイッチを押したまま、RESETスイッチを押す。
-    * Enterキーを一度押し、"@"が表示されることを確認する。
+    * BOOTSTRAPスイッチを押したまま、RESETスイッチを押します。
+    * Enterキーを一度押し、"@"が表示されることを確認します。
 1. upload.bをシリアルターミナルからアップロードします。
-    * Teratermを使う場合は、遅延を入れる。(1文字ごとに0ms, 改行ごとに100ms程度）
+    * Teratermを使う場合は、遅延を入れます。(1文字ごとに0ms, 改行ごとに100ms程度）
 1. アップロードが完了すると、フラッシュ書き込み機能付きモニタが起動します。
     ```
     Passed.
