@@ -13,17 +13,17 @@ IOBASE  EQU $02000300
 * 0    E    6    3    0    0    0    A
 *
 
-START:
-*                                           ; Product identification code (+0000h)
-      move.w     #$0080, (IOBASE + $000a)   ; PacketPage Pointer Port (I/O base + 000Ah).
+START:                             ; first instruction of program
+*      move.w    #$0080, d0           ;  Product identification code (+0000h)
+      move.w     #$0080, (IOBASE + $000a)   ;  PacketPage Pointer Port (I/O base + 000Ah).
 
-      move.w    (IOBASE + $000c), d0        ; PacketPage Data Port (I/O base +000Ch)
-      bsr       $0000171A                   ; call printhex word
+      move.w    (IOBASE + $000c), d0       ;  PacketPage Data Port (I/O base +000Ch)
+      bsr       $0000171A           ; call printhex word
 
-      move.w    (IOBASE + $000e), d0        ; PacketPage Data Port (I/O base +000Eh)
-      bsr       $0000171A                   ; call printhex word
+      move.w    (IOBASE + $000e), d0       ;  PacketPage Data Port (I/O base +000Ch)
+      bsr       $0000171A           ; call printhex word
 
-      bra       $00001064                   ; return to moniror
+      bra       $00001064           ; return to moniror
 
     SIMHALT             ; halt simulator
 
