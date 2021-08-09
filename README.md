@@ -38,7 +38,7 @@ CPU board PCB image (alpha version)
 ![CPU PCB image by KiCad](/Pictures/DragonOne_rev01_kicad.jpg)
 
 LAN board PCB image (alpha version)  
-![LAN PCB image by KiCad](/Pictures/mc68ez328_sbc_lan_rev01_kicad.png)
+![LAN PCB image by KiCad](/Pictures/mc68ez328_sbc_lan_rev01_kicad.jpg)
 
 
 ## License Information
