@@ -34,8 +34,11 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 MC68EZ328 CPU  
 ![MC68EZ328 CPU](/Pictures/dragonball_mc68ez328_cpu.jpg)
 
-PCB image (alpha version)  
-![PCB image by KiCad](/Pictures/DragonOne_rev01_kicad.jpg)
+CPU board PCB image (alpha version)  
+![CPU PCB image by KiCad](/Pictures/DragonOne_rev01_kicad.jpg)
+
+LAN board PCB image (alpha version)  
+![LAN PCB image by KiCad](/Pictures/mc68ez328_sbc_lan_rev01_kicad.png)
 
 
 ## License Information
