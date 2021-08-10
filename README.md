@@ -21,7 +21,7 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 * /bbug/
   * BBUG: a bootstrap mode debugger. Implementation of BBUG using python3 and pyserial.
 * /Hardware/
-  * Schematic PDF
+  * PDF files of schematics and BOMs
 * /KiCad/
   * PCB design data and Gerber data for [KiCad](https://www.kicad.org/). (TBA) 
 * /Pictues/
