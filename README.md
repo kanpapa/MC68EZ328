@@ -40,7 +40,7 @@ CPU board PCB image (alpha version)
 LAN board PCB image (alpha version)  
 ![LAN PCB image by KiCad](/Pictures/mc68ez328_sbc_lan_rev01_kicad.jpg)
 
-Running uClinux
+Running uClinux  
 ![Running uClinux](/Pictures/mc68ez328-dragonone-sbc-lan-ping2.png)
 
 ## License Information
