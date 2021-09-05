@@ -20,6 +20,8 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
   * All b-record for programming and testing the MC68EZ328 DragonOne.
 * /bbug/
   * BBUG: a bootstrap mode debugger. Implementation of BBUG using python3 and pyserial.
+* /d/
+  * This is the data to execute a series of commands in 68k-Monitor.  
 * /Hardware/
   * PDF files of schematics and BOMs
 * /KiCad/
