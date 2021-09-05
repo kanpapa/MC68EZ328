@@ -1,6 +1,6 @@
 # b
 
-This is a bootstrap records (b-records) for the MC68EZ328 bootstarp mode.
+This is the bootstrap records (b-records) for the MC68EZ328 bootstarp mode.
 
 - init.b --- Initializing the MC68EZ328
 - helloworld.b --- Test program to keep displaying "hello world".
