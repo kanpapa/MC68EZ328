@@ -45,6 +45,9 @@ LAN board PCB image (alpha version)
 Running uClinux  
 ![Running uClinux](/Pictures/mc68ez328-dragonone-sbc-lan-ping2.png)
 
+Running Network!  
+![Running Network](/Pictures/mc68ez328_lan_rev02_5.jpg)
+
 ## License Information
 
 This code is public domain under the BSD-3-Clause License.
