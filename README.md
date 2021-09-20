@@ -37,6 +37,10 @@ See below for the uClinux source code and tools for the MC68EZ328 DragonOne SBC.
 https://github.com/kanpapa/uClinux-dist-20020220  
 https://github.com/kanpapa/m68k-elf-tools  
 
+## Blog
+
+You can also refer to my blog.  
+https://kanpapa.com/today/electronics/microcomputer/mc68ez328/
 
 ## Pictures
 
