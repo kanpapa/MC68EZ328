@@ -39,7 +39,7 @@ https://github.com/kanpapa/m68k-elf-tools
 
 ## Blog
 
-You can also refer to my blog.  
+You can also refer to my blog. (in Japanese)    
 https://kanpapa.com/today/electronics/microcomputer/mc68ez328/
 
 ## Pictures
