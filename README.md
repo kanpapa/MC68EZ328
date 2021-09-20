@@ -1,7 +1,5 @@
 # MC68EZ328 DragonOne SBC
 
-Under construction...  
-
 We are designing the MC68EZ328 DragonOne SBC with KiCad.
 
 Based on DragonOne V1.0 (C) Khaled Hassounah  
