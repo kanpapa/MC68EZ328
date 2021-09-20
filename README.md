@@ -51,6 +51,8 @@ Running Network!
 ## License Information
 
 This code is public domain under the BSD-3-Clause License.
+Copyright (c) 2021, Kazuhiro Ouchi
+All rights reserved.
 
 References to any products, programs or services do not imply that they will be available in all countries in which their respective owner operates.
 
