@@ -29,6 +29,15 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 * /src
   * All Source Code for Flash Programming and test programming. The assembler uses [EASy68K](http://www.easy68k.com/).
 
+## How to install uClinux for the DragonOne SBC
+
+[How to install uClinux](/uClinux-build2flash.md)  
+
+See below for the uClinux source code and tools for the MC68EZ328 DragonOne SBC.  
+https://github.com/kanpapa/uClinux-dist-20020220  
+https://github.com/kanpapa/m68k-elf-tools  
+
+
 ## Pictures
 
 MC68EZ328 CPU  
@@ -46,13 +55,6 @@ Running uClinux
 Running Network!  
 ![Running Network](/Pictures/mc68ez328_lan_rev02_5.jpg)
 
-## uClinux for the DragonOne SBC
-
-[How to install uClinux](/uClinux-build2flash.md)  
-
-See below for the uClinux source code and tools for the MC68EZ328 DragonOne SBC.  
-https://github.com/kanpapa/uClinux-dist-20020220  
-https://github.com/kanpapa/m68k-elf-tools  
 
 ## License Information
 
