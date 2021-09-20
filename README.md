@@ -48,9 +48,11 @@ Running Network!
 
 ## uClinux for the DragonOne SBC
 
-See below for the uClinux source code for the MC68EZ328 DragonOne SBC.  
-https://github.com/kanpapa/uClinux-dist-20020220
+![How to install uClinux](/uClinux-build2flash.md)  
 
+See below for the uClinux source code and tools for the MC68EZ328 DragonOne SBC.  
+https://github.com/kanpapa/uClinux-dist-20020220  
+https://github.com/kanpapa/m68k-elf-tools  
 
 ## License Information
 
