@@ -126,3 +126,67 @@ $ echo "0000100000" >> upload.b
 
 リセットボタンを押すとMC68EZ328 SBCでuClinuxが起動します。
 
+```
+Linux version 2.4.17-uc0 (ocha@debian) (gcc version 2.95.3 20010315 (release)(ColdFire patches - 20010318 from http://fiddes.net/coldfire/)(uClinux XIP and shared lib patches from http://www.snapgear.com/)) #3 Sun 22 Aug 2021 04:05:22 PM JST
+
+68EZ328 DragonBallEZ support (C) 1999 Rt-Control, Inc
+
+
+uClinux/MC68EZ328
+Flat model support (C) 1998,1999 Kenneth Albanowski, D. Jeff Dionne
+On node 0 totalpages: 2048
+zone(0): 0 pages.
+zone(1): 2048 pages.
+zone(2): 0 pages.
+Kernel command line:
+Calibrating delay loop... 0.92 BogoMIPS
+Memory available: 7692k/8064k RAM, 0k/0k ROM (570k kernel code, 225k data)
+Dentry-cache hash table entries: 1024 (order: 1, 8192 bytes)
+Inode-cache hash table entries: 512 (order: 0, 4096 bytes)
+Mount-cache hash table entries: 512 (order: 0, 4096 bytes)
+Buffer-cache hash table entries: 1024 (order: 0, 4096 bytes)
+Page-cache hash table entries: 2048 (order: 1, 8192 bytes)
+POSIX conformance testing by UNIFIX
+Linux NET4.0 for Linux 2.4
+Based upon Swansea University Computer Society NET3.039
+Initializing RT netlink socket
+Starting kswapd
+MC68328 serial driver version 1.00
+ttyS0 at 0xfffff900 (irq = 64) is a builtin MC68328 UART
+block: 64 slots per queue, batch=16
+RAMDISK driver initialized: 16 RAM disks of 4096K size 1024 blocksize
+cs89x0:cs89x0_probe(0x0)
+cs89x0: Setting up uCsimm CS8900 Chip Select & IRQ ioaddr = 0x2000300
+cs89x0.c: v2.4.3-pre1 Russell Nelson <nelson@crynwr.com>, Andrew Morton <andrewm@uow.edu.au>
+eth0: cs8900 rev K found at 0x2000300
+cs89x0 media RJ-45, IRQ 20, programmed I/O, MAC 00:10:8b:f1:da:01
+cs89x0_probe1() successful
+Blkmem copyright 1998,1999 D. Jeff Dionne
+Blkmem copyright 1998 Kenneth Albanowski
+Blkmem 1 disk images:
+0: 100B4FB8-101847B7 [VIRTUAL 100B4FB8-101847B7] (RO)
+NET4: Linux TCP/IP 1.0 for NET4.0
+IP Protocols: ICMP, UDP, TCP
+IP: routing cache hash table of 512 buckets, 4Kbytes
+TCP: Hash tables configured (established 512 bind 512)
+NET4: Unix domain sockets 1.0/SMP for Linux NET4.0.
+VFS: Mounted root (romfs filesystem) readonly.
+eth0: using half-duplex 10Base-T (RJ-45)
+Welcome to
+          ____ _  _
+         /  __| ||_|
+    _   _| |  | | _ ____  _   _  _  _
+   | | | | |  | || |  _ \| | | |\ \/ /
+   | |_| | |__| || | | | | |_| |/    \
+   |  ___\____|_||_|_| |_|\____|\_/\_/
+   | |
+   |_|
+
+For further information check:
+http://www.uclinux.org/
+
+
+uCsimm login: root
+Password:
+#
+```
