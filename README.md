@@ -23,7 +23,7 @@ http://www.mediumware.net/DragonOne/DragonOne.htm
 * /Hardware/
   * PDF files of schematics and BOMs
 * /KiCad/
-  * PCB design data and Gerber data for [KiCad](https://www.kicad.org/). (TBA) 
+  * PCB design data and Gerber data for [KiCad](https://www.kicad.org/).
 * /Pictues/
   * some pictures
 * /src
