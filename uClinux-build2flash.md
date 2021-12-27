@@ -2,15 +2,15 @@
 
 ## ビルド環境のOSのインストール
 
-debian 10 i386をVMWare Playerの仮想環境で動かします。
+debian i386をVMWare Playerの仮想環境で動かします。
 
 1. VMware Workstation Playerをインストールします。(非営利目的であれば無償)
-1. [debian](https://www.debian.org/)の公式サイトから[debian-10.10.0-i386-xfce-CD-1.iso](https://cdimage.debian.org/debian-cd/current/i386/iso-cd/)をダウンロードします。
-1. 新規仮想マシンの作成で、debian 10.10 32bitを動かします。
+1. [debian](https://www.debian.org/)の公式サイトから[debian-11.2.0-i386-netinst.iso](https://cdimage.debian.org/debian-cd/current/i386/iso-cd/)をダウンロードします。
+1. 新規仮想マシンの作成で、debian 11.x 32bitを動かします。
 
 ## 必要なパッケージをインストール
 
-debian 10 i386が起動したら以下の手順で必要なパッケージをインストールします。
+debian i386が起動したら以下の手順で必要なパッケージをインストールします。
 
 ```
 $ sudo apt install build-essential
