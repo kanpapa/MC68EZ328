@@ -5,12 +5,12 @@
 Run debian 10 i386 in a VMWare Player virtual environment.
 
 1. Install VMware Workstation Player. (Free for non-commercial use).
-1. Download [debian-10.10.0-i386-xfce-CD-1.iso](https://cdimage.debian.org/debian-cd/current/i386/iso-cd/) from [debian official site](https://www.debian.org/).
-1. Create a new virtual machine and run debian 10.10 32bit.
+1. Download [debian-11.2.0-i386-netinst.iso](https://cdimage.debian.org/debian-cd/current/i386/iso-cd/) from [debian official site](https://www.debian.org/).
+1. Create a new virtual machine and run debian 11.x 32bit.
 
 ## Install the necessary packages.
 
-After debian 10 i386 is started, follow the steps below to install the necessary packages.
+After debian 11 i386 is started, follow the steps below to install the necessary packages.
 
 ```
 $ sudo apt install build-essential
