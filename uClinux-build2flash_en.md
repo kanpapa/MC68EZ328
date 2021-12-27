@@ -2,7 +2,7 @@
 
 ## Installing the OS in the build environment
 
-Run debian 10 i386 in a VMWare Player virtual environment.
+Run debian i386 in a VMWare Player virtual environment.
 
 1. Install VMware Workstation Player. (Free for non-commercial use).
 1. Download [debian-11.2.0-i386-netinst.iso](https://cdimage.debian.org/debian-cd/current/i386/iso-cd/) from [debian official site](https://www.debian.org/).
@@ -10,7 +10,7 @@ Run debian 10 i386 in a VMWare Player virtual environment.
 
 ## Install the necessary packages.
 
-After debian 11 i386 is started, follow the steps below to install the necessary packages.
+After debian i386 is started, follow the steps below to install the necessary packages.
 
 ```
 $ sudo apt install build-essential
