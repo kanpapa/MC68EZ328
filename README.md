@@ -47,11 +47,11 @@ https://kanpapa.com/today/electronics/microcomputer/mc68ez328/
 MC68EZ328 CPU  
 ![MC68EZ328 CPU](/Pictures/dragonball_mc68ez328_cpu.jpg)
 
-CPU board PCB image (alpha version)  
-![CPU PCB image by KiCad](/Pictures/DragonOne_rev01_kicad.jpg)
+CPU board Rev. 0.3 PCB image  
+![CPU PCB image by KiCad](/Pictures/mc68ez328_sbc_cpu_rev03_kicad.jpg)
 
-LAN board PCB image (alpha version)  
-![LAN PCB image by KiCad](/Pictures/mc68ez328_sbc_lan_rev01_kicad.jpg)
+LAN board Rev. 0.2 PCB image  
+![LAN PCB image by KiCad](/Pictures/mc68ez328_sbc_lan_rev02_kicad.jpg)
 
 Running uClinux  
 ![Running uClinux](/Pictures/mc68ez328-dragonone-sbc-lan-ping2.png)
